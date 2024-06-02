@@ -1,4 +1,4 @@
-
+import 'package:adtip_web_3/modules/dashboard/controller/dashboard_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -9,10 +9,10 @@ import '../../../widgets/button/c_login_button.dart';
 import '../../createCompany/model/companyDetail.dart';
 import '../../createCompany/widget/appbar_widget.dart';
 import '../controller/edit_company_controller.dart';
+import '../controller/my_company_controller.dart';
 
 class EditButtonPage extends StatefulWidget {
-  final CompanyDetail companyData;
-  const EditButtonPage({super.key, required this.companyData});
+  const EditButtonPage({super.key});
 
   @override
   State<EditButtonPage> createState() => _EditButtonPageState();
@@ -20,6 +20,7 @@ class EditButtonPage extends StatefulWidget {
 
 class _EditButtonPageState extends State<EditButtonPage> {
   late int selectedRadio;
+  final dashboardController = Get.put(DashboardController());
   @override
   void initState() {
     super.initState();
@@ -44,28 +45,24 @@ class _EditButtonPageState extends State<EditButtonPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: appBar(
-          title: "Edit Company Page",
-          showIcon: false,
-          textColor: AdtipColors.black),
-      backgroundColor: Color(0xffF5F7FF),
-      body: SingleChildScrollView(
+    return SizedBox(
+      width: 500,
+      child: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Text(
               'Select Button',
-              style: GoogleFonts.inter(
-                  fontSize: 27, fontWeight: FontWeight.w500),
+              style:
+                  GoogleFonts.inter(fontSize: 27, fontWeight: FontWeight.w500),
             ),
             Container(
               alignment: Alignment.center,
-              padding: EdgeInsets.all(30),
+              padding: const EdgeInsets.all(30),
               child: Text(
-                'Fill the information to use the excluive features in advertiser panel',
+                'Fill the information to use the exclusive features in advertiser panel',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                     fontSize: 13, fontWeight: FontWeight.w500),
@@ -77,17 +74,18 @@ class _EditButtonPageState extends State<EditButtonPage> {
             ListView.builder(
                 shrinkWrap: true,
                 itemCount: radioButtonList.length,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
                     decoration: BoxDecoration(
                         border: Border.all(color: Color(0xffE4EAFF)),
                         color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(5))),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(5))),
                     margin:
-                        EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                     padding:
-                        EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -110,7 +108,7 @@ class _EditButtonPageState extends State<EditButtonPage> {
                   );
                 }),
             Container(
-              margin: EdgeInsets.all(15),
+              margin: const EdgeInsets.all(15),
               child: CLoginButton(
                   title: 'Save',
                   buttonColor: AdtipColors.black,
@@ -124,14 +122,14 @@ class _EditButtonPageState extends State<EditButtonPage> {
                     controller.userCompanyProfile.buttonType =
                         radioButtonList[selectedRadio - 1];
                     controller.update();
-                    Navigator.of(context).pop();
+                    dashboardController.changeWidget(value: 6);
                   }),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: InkWell(
                 onTap: () {
-                  Get.back();
+                  dashboardController.changeWidget(value: 6);
                 },
                 child: Container(
                     height: 45,
@@ -150,7 +148,7 @@ class _EditButtonPageState extends State<EditButtonPage> {
                     )),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
           ],

@@ -1,3 +1,4 @@
+import 'package:adtip_web_3/modules/dashboard/controller/dashboard_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,6 +18,7 @@ class PostController extends GetxController {
   final _apiServices = NetworkApiServices();
   // List<PostData> postData = [];
   RxList<PostData> postData = <PostData>[].obs;
+  final dashboardController = Get.put(DashboardController());
 
   Future addPost(
       {String? postDescription,
@@ -40,11 +42,11 @@ class PostController extends GetxController {
       loading.value = true;
       final response = await _apiServices.postApi(data, UrlConstants.postUrl);
       if (response != null) {
-        Get.back();
         Get.snackbar("Post added Successfully", "",
             colorText: Colors.white, backgroundColor: Colors.green);
         await getPostList(companyId: int.tryParse(companyId)!);
         postData.refresh();
+        dashboardController.changeWidget(value: 2);
       }
       loading.value = false;
     } on Exception catch (e) {

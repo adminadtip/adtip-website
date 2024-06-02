@@ -127,4 +127,12 @@ class UrlConstants {
   static String deletePost = '${BASE_URL}deletepost';
   static String getAllCompany = '${BASE_URL}getallcompanylist/';
   static String getUserCompanyList = '${BASE_URL}getcompanylist/';
+  static String deleteCompany = '${BASE_URL}deletecompany/';
+  static String getAllCompanyPostsById = '${BASE_URL}getAllCompanyPosts/';
+
+  ///website
+  static String saveWebsiteMessage = '${BASE_URL}savewebsitemessage/';
+  static String checkadpendingbalance = '${BASE_URL}checkadpendingbalance/';
+  static String insertQRScanWebData = '${BASE_URL}insertQRScanWebData';
+  static String getQrWebData = '${BASE_URL}getQrAdWebByAdIdForAdvertiser';
 }

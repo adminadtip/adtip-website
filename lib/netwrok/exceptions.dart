@@ -70,7 +70,7 @@ class InternetException implements Exception {
   }
 }
 
-class InvalidUrlException implements Exception{
+class InvalidUrlException implements Exception {
   late String _message;
 
   InvalidUrlException([String message = 'Request time out Occurred']) {
@@ -84,7 +84,7 @@ class InvalidUrlException implements Exception{
   }
 }
 
-class FetchDataException implements Exception{
+class FetchDataException implements Exception {
   late String _message;
 
   FetchDataException([String message = 'Fetch data error Occurred']) {
@@ -101,11 +101,10 @@ class FetchDataException implements Exception{
 /// ********
 
 ///400
-class BadRequest implements Exception{
+class BadRequest implements Exception {
   late String _message;
 
-  BadRequest([String message = 'Bad Request']) {
-    this._message = message;
+  BadRequest([String message = 'Not found']) {
     // CustomSnackBar(_message, "E") ;
   }
 
@@ -116,11 +115,11 @@ class BadRequest implements Exception{
 }
 
 ///401
-class Unauthorized implements Exception{
+class Unauthorized implements Exception {
   late String _message;
 
   Unauthorized([String message = 'UnAuthorized']) {
-    this._message = message;
+    _message = message;
     // CustomSnackBar(_message, "E") ;
   }
 
@@ -131,7 +130,7 @@ class Unauthorized implements Exception{
 }
 
 ///403
-class Forbidden implements Exception{
+class Forbidden implements Exception {
   late String _message;
 
   Forbidden([String message = 'Forbidden']) {
@@ -146,7 +145,7 @@ class Forbidden implements Exception{
 }
 
 ///404
-class NotFound implements Exception{
+class NotFound implements Exception {
   late String _message;
 
   NotFound([String message = 'Not Found']) {
@@ -176,7 +175,7 @@ class RequestTimeOut implements Exception {
 }
 
 ///500
-class InternalServerError implements Exception{
+class InternalServerError implements Exception {
   late String _message;
 
   InternalServerError([String message = 'Internal Server Error']) {
@@ -191,7 +190,7 @@ class InternalServerError implements Exception{
 }
 
 ///502
-class BadGateway implements Exception{
+class BadGateway implements Exception {
   late String _message;
 
   BadGateway([String message = 'Bad Gateway']) {

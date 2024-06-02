@@ -1,5 +1,6 @@
 import 'package:adtip_web_3/modules/authentication/pages/check_user_company.dart';
 import 'package:adtip_web_3/modules/authentication/pages/otp_screen.dart';
+import 'package:adtip_web_3/netwrok/exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,6 +16,7 @@ class LoginController extends GetxController {
   Rx<bool> isLoading = false.obs;
   final _apiServices = NetworkApiServices();
   Rx<bool> checkOtp = false.obs;
+  Rx<int> otpId = 0.obs;
 
   Future<void> sendOTP({required String mobileNumber}) async {
     try {
@@ -26,6 +28,7 @@ class LoginController extends GetxController {
       };
       final response = await _apiServices.postApi(body, UrlConstants.sentOtp);
       print('response phone ${response['data'][0]['id']}');
+      otpId.value = response['data'][0]['id'];
       Get.to(() => OtpScreen(
             mobileNumber: mobileNumber,
             id: response['data'][0]['id'],
@@ -41,9 +44,8 @@ class LoginController extends GetxController {
   Future<void> verifyOTP(String otp, int id) async {
     try {
       checkOtp.value = true;
-      final body = {"id": id, "otp": "$otp"};
+      final body = {"id": id, "otp": otp};
       final response = await _apiServices.postApi(body, UrlConstants.verifyOtp);
-      print('response otp $response');
       await LocalPrefs().setIntegerPref(
           key: SharedPreferenceKey.UserId, value: response['data'][0]['id']);
       await LocalPrefs().setStringPref(
@@ -53,15 +55,17 @@ class LoginController extends GetxController {
       Get.offAll(const CheckUserCompanyExist());
     } catch (e) {
       checkOtp.value = false;
-      Utils.showErrorMessage('Something went wrong. $e');
+      Utils.showErrorMessage(e.toString());
+    } finally {
+      checkOtp.value = false;
     }
   }
 
   Future<bool?> checkCompanyExists() async {
-    print("API Called");
     try {
       final int? userId =
           LocalPrefs().getIntegerPref(key: SharedPreferenceKey.UserId);
+      print("API Called $userId");
 
       final response = await _apiServices
           .getApi('${UrlConstants.getUserCompanyList}$userId');

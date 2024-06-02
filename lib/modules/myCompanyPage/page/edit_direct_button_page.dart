@@ -1,3 +1,5 @@
+import 'package:adtip_web_3/helpers/utils/utils.dart';
+import 'package:adtip_web_3/modules/dashboard/controller/dashboard_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,11 +10,11 @@ import '../../../widgets/button/c_login_button.dart';
 import '../../createCompany/model/companyDetail.dart';
 import '../../createCompany/widget/appbar_widget.dart';
 import '../controller/edit_company_controller.dart';
+import '../controller/my_company_controller.dart';
 import 'edit_button_page.dart';
 
 class EditDirectButtonPage extends StatefulWidget {
-  final CompanyDetail companyData;
-  const EditDirectButtonPage({super.key, required this.companyData});
+  const EditDirectButtonPage({super.key});
 
   @override
   State<EditDirectButtonPage> createState() => _EditDirectButtonPageState();
@@ -21,33 +23,32 @@ class EditDirectButtonPage extends StatefulWidget {
 class _EditDirectButtonPageState extends State<EditDirectButtonPage> {
   bool isChecked = false;
   final controller = Get.put(EditCompanyController());
+  final myCompanyController = Get.put(MyCompanyController());
+  final dashboardController = Get.put(DashboardController());
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xffF5F7FF),
-      appBar: appBar(
-          title: "Edit Company Page",
-          showIcon: false,
-          textColor: AdtipColors.black),
-      body: SingleChildScrollView(
+    return SizedBox(
+      width: 500,
+      child: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
             GestureDetector(
               onTap: () {
-                Get.to(() => EditButtonPage(
-                      companyData: widget.companyData,
-                    ));
+                dashboardController.changeWidget(value: 17);
               },
               child: Container(
                 decoration: BoxDecoration(
-                    border: Border.all(color: Color(0xffE4EAFF)),
+                    border: Border.all(color: const Color(0xffE4EAFF)),
                     color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
-                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                    borderRadius: const BorderRadius.all(Radius.circular(5))),
+                margin:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -57,15 +58,16 @@ class _EditDirectButtonPageState extends State<EditDirectButtonPage> {
                           AdtipAssets.PERSON_BLUE_ICON,
                           height: 20,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 10,
                         ),
                         Obx(
                           () => Text(
                             controller.buttonSelected.value != ""
                                 ? controller.buttonSelected.value
-                                : widget.companyData.button != null
-                                    ? widget.companyData.button!
+                                : myCompanyController.company.value!.button !=
+                                        null
+                                    ? myCompanyController.company.value!.button!
                                     : "Add Button",
                             style:
                                 GoogleFonts.roboto(color: Colors.grey.shade400),
@@ -73,7 +75,7 @@ class _EditDirectButtonPageState extends State<EditDirectButtonPage> {
                         )
                       ],
                     ),
-                    Icon(
+                    const Icon(
                       Icons.arrow_forward_ios_outlined,
                       size: 12,
                     )
@@ -83,11 +85,11 @@ class _EditDirectButtonPageState extends State<EditDirectButtonPage> {
             ),
             Container(
               decoration: BoxDecoration(
-                  border: Border.all(color: Color(0xffE4EAFF)),
+                  border: Border.all(color: const Color(0xffE4EAFF)),
                   color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-              padding: EdgeInsets.symmetric(horizontal: 10),
+                  borderRadius: const BorderRadius.all(Radius.circular(5))),
+              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -109,7 +111,7 @@ class _EditDirectButtonPageState extends State<EditDirectButtonPage> {
             ),
             Obx(
               () => Container(
-                margin: EdgeInsets.all(15),
+                margin: const EdgeInsets.all(15),
                 child: CLoginButton(
                     title: 'Save',
                     buttonColor: AdtipColors.black,
@@ -118,21 +120,20 @@ class _EditDirectButtonPageState extends State<EditDirectButtonPage> {
                     isLoading: controller.isLoading.value,
                     onTap: () {
                       if (controller.buttonSelected.value == "" &&
-                          widget.companyData.button == null) {
-                        controller.showMessage("Select Add Button",
-                            isError: true);
+                          myCompanyController.company.value!.button == null) {
+                        Utils.showErrorMessage('Select Add Button');
                       } else {
                         controller.updateCompany(
-                            companyId: widget.companyData.id!);
+                            companyId: myCompanyController.company.value!.id!);
                       }
                     }),
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: InkWell(
                 onTap: () {
-                  Get.back();
+                  dashboardController.changeWidget(value: 5);
                 },
                 child: Container(
                     height: 45,

@@ -1,3 +1,4 @@
+import 'package:adtip_web_3/modules/dashboard/controller/dashboard_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -10,11 +11,11 @@ import '../../createCompany/model/companyDetail.dart';
 import '../../createCompany/widget/appbar_widget.dart';
 import '../../createCompany/widget/c_textFormField.dart';
 import '../controller/edit_company_controller.dart';
+import '../controller/my_company_controller.dart';
 import 'edit_company_picture.dart';
 
 class EditCompany extends StatefulWidget {
-  final CompanyDetail companyData;
-  const EditCompany({super.key, required this.companyData});
+  const EditCompany({super.key});
 
   @override
   State<EditCompany> createState() => _EditCompanyState();
@@ -26,6 +27,8 @@ class _EditCompanyState extends State<EditCompany> {
   final _formKey = GlobalKey<FormState>();
   String? websiteURL;
   String? description;
+  final myCompanyController = Get.put(MyCompanyController());
+  final dashboardController = Get.put(DashboardController());
 
   String? hasValidUrl(String value) {
     String pattern =
@@ -41,22 +44,18 @@ class _EditCompanyState extends State<EditCompany> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xffF5F7FF),
-      appBar: appBar(
-          title: "Edit Company Page",
-          showIcon: false,
-          textColor: AdtipColors.black),
-      body: SingleChildScrollView(
+    return SizedBox(
+      width: 500,
+      child: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
                   Text(
@@ -64,15 +63,15 @@ class _EditCompanyState extends State<EditCompany> {
                     style: GoogleFonts.inter(
                         fontSize: 22, fontWeight: FontWeight.w500),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   descriptione(),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   CTextFormField(
-                    initialValue: widget.companyData.website,
+                    initialValue: myCompanyController.company.value!.website,
                     hintText: "Website",
                     keyboardType: TextInputType.multiline,
                     callBack: (p0) {
@@ -92,18 +91,18 @@ class _EditCompanyState extends State<EditCompany> {
                       }
                     },
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 15,
                   ),
                   nextButton(),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: InkWell(
                       onTap: () {
-                        Get.back();
+                        dashboardController.changeWidget(value: 3);
                       },
                       child: Container(
                           height: 45,
@@ -156,7 +155,7 @@ class _EditCompanyState extends State<EditCompany> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                        padding: EdgeInsets.only(top: 12),
+                        padding: const EdgeInsets.only(top: 12),
                         child: Image.asset(
                           AdtipAssets.PERSON_BLUE_ICON,
                           height: 20,
@@ -169,7 +168,7 @@ class _EditCompanyState extends State<EditCompany> {
                     ),
                     Flexible(
                       child: TextFormField(
-                        initialValue: widget.companyData.about,
+                        initialValue: myCompanyController.company.value!.about,
                         onChanged: (val) {
                           description = val;
                         },
@@ -202,7 +201,7 @@ class _EditCompanyState extends State<EditCompany> {
   Widget companyView(int index, String label) {
     return Row(
       children: [
-        SizedBox(
+        const SizedBox(
           width: 4,
         ),
         InkWell(
@@ -233,7 +232,7 @@ class _EditCompanyState extends State<EditCompany> {
             indent: 7,
             endIndent: 7,
           ),
-        SizedBox(
+        const SizedBox(
           width: 4,
         )
       ],
@@ -251,9 +250,7 @@ class _EditCompanyState extends State<EditCompany> {
           if (_formKey.currentState!.validate()) {
             controller.userCompanyProfile.websiteUrl = websiteURL;
             controller.userCompanyProfile.description = description;
-            Get.to(() => CompanyEditImage(
-                  companyData: widget.companyData,
-                ));
+            dashboardController.changeWidget(value: 5);
           }
         });
   }

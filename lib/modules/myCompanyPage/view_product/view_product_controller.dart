@@ -13,11 +13,14 @@ class ProductController extends GetxController {
     try {
       productListData.clear();
       loading.value = true;
+      update();
+
       final response =
           await _apiServices.getApi("${UrlConstants.getProductList}$companyId");
       ProductListModel productListModel = ProductListModel.fromJson(response);
       productListData.addAll(productListModel.data ?? []);
       loading.value = false;
+      update();
     } on Exception catch (e) {
       loading.value = false;
 

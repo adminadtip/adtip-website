@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:adtip_web_3/modules/dashboard/controller/dashboard_controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,6 +17,7 @@ class MyCompanyController extends GetxController {
   final _apiServices = NetworkApiServices();
   RxBool get isLoading => _isLoading;
   Rx<bool> companyDetailsFetching = false.obs;
+  final dashboardController = Get.put(DashboardController());
 
   RxList<CompanyProductModel> companyProductList = <CompanyProductModel>[].obs;
   final int? _userId =
@@ -30,12 +33,18 @@ class MyCompanyController extends GetxController {
           CompanyResponse.fromJson(json: response);
       if (companyResponse.companyDetails!.isNotEmpty) {
         company.value = companyResponse.companyDetails![0];
-        print('company data ${company.value?.coverImage!}');
+        if (kDebugMode) {
+          print('company data ${company.value?.coverImage!}');
+        }
       }
       companyDetailsFetching.value = false;
     } catch (e) {
       companyDetailsFetching.value = false;
-      print('error occurred fetching company $e');
+      if (kDebugMode) {
+        print('error occurred fetching company $e');
+      }
+    } finally {
+      companyDetailsFetching.value = false;
     }
   }
 
@@ -62,14 +71,27 @@ class MyCompanyController extends GetxController {
                 .map((item) =>
                     CompanyProductModel.fromJson(item as Map<String, dynamic>))
                 .toList();
-            print('product list ${companyProductList.length}');
+            if (kDebugMode) {
+              print('product list ${companyProductList.length}');
+            }
           }
         } else {
           // Handle the case where "data" is not a list
         }
       }
       _isLoading.value = false;
-    } catch (e) {}
+    } catch (e) {
+      _isLoading.value = false;
+    } finally {
+      _isLoading.value = false;
+    }
     return companyProductList;
+  }
+
+  changeWidget(int value) {
+    dashboardController.changeWidget(value: value);
+    if (kDebugMode) {
+      print('dashboard widget ${dashboardController.selected.value}');
+    }
   }
 }

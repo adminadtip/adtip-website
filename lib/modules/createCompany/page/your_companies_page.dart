@@ -25,94 +25,57 @@ import '../model/companyDetail.dart';
 import 'create_company_page.dart';
 
 class YourCompaniesPage extends StatefulWidget {
-  final int userId;
-  const YourCompaniesPage({super.key, required this.userId});
+  const YourCompaniesPage({super.key});
   @override
   State<YourCompaniesPage> createState() => _YourCompaniesPageState();
 }
 
 class _YourCompaniesPageState extends State<YourCompaniesPage> {
   final controller = Get.put(CreateCompanyController());
-  List<CompanyDetail>? companyList;
+  DashboardController dashboardController = Get.put(DashboardController());
+
   @override
   void initState() {
     super.initState();
-    fetchCompaniesList();
+    if (controller.fetchedCompanyList.isNotEmpty) {
+      controller.fetchCompanyList();
+    }
   }
 
   DashboardController dashBoardController = Get.put(DashboardController());
   ScreenshotController screenshotController = ScreenshotController();
 
-  get _userId => LocalPrefs().getIntegerPref(key: SharedPreferenceKey.UserId);
   bool qrShow = false;
-
-  void fetchCompaniesList() async {
-    companyList = await controller.fetchCompanyList(widget.userId);
-    setState(() {});
-  }
-
-  Future _shareQrCode(id) async {
-    print('$id rule 56');
-    try {
-      final directory = (await getApplicationDocumentsDirectory()).path;
-      String fileName = DateTime.now().microsecondsSinceEpoch.toString();
-      final imageFile = await File('$directory/$fileName.png').create();
-      screenshotController.capture().then((Uint8List? image) async {
-        print('$image rule 56');
-        if (image != null) {
-          try {
-            await imageFile.writeAsBytes(image);
-            Share.shareFiles([imageFile.path]);
-            setState(() {
-              qrShow = false;
-            });
-          } catch (error) {}
-        }
-      }).catchError((onError) {
-        print('Error --->> $onError');
-      });
-    } on PlatformException catch (err) {
-      print(err);
-    } catch (err) {
-      print(err);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    print(widget.userId);
-    print(_userId);
-
-    return Scaffold(
-      backgroundColor: const Color(0xffF5F7FF),
-      body: Obx(() {
-        return Center(
-          child: SizedBox(
-            width: 500,
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                child: controller.isLoading.value
-                    ? const CircularProgressIndicator()
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          listView(),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          if (widget.userId == _userId) addCompanyButton(),
-                        ],
+    return Obx(() {
+      return controller.isLoading.value
+          ? const SizedBox(
+              width: 50, height: 50, child: CircularProgressIndicator())
+          : SizedBox(
+              width: 500,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(
+                        height: 20,
                       ),
+                      listView(),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      addCompanyButton(),
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
-        );
-      }),
-    );
+            );
+    });
   }
 
 //
@@ -141,17 +104,17 @@ class _YourCompaniesPageState extends State<YourCompaniesPage> {
   }
 
   StatelessWidget listView() {
-    return companyList == null
+    return controller.fetchedCompanyList.isEmpty
         ? const Loader()
         : ListView.separated(
             separatorBuilder: (context, index) => const SizedBox(
                   height: 10,
                 ),
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: companyList!.length,
+            itemCount: controller.fetchedCompanyList.length,
             shrinkWrap: true,
             itemBuilder: (context, index) {
-              final companyData = companyList![index];
+              final companyData = controller.fetchedCompanyList[index];
               return Stack(
                 children: [
                   if (qrShow)
@@ -235,60 +198,69 @@ class _YourCompaniesPageState extends State<YourCompaniesPage> {
                                   thickness: 0.3,
                                   color: AdtipColors.grey,
                                 ),
-                                if (widget.userId == _userId)
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Get.to(
-                                            () => MyCompanyPage(
-                                              companyID: companyList![index]
-                                                  .id
-                                                  .toString(),
-                                            ),
-                                            arguments: companyList![index],
-                                          );
-                                        },
-                                        child: Text(
-                                          'View page',
-                                          style: GoogleFonts.poppins(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 14,
-                                              color: AdtipColors.lightBlue),
-                                        ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        controller.changeCompanyIndex(
+                                            index: index,
+                                            companyId: controller
+                                                .fetchedCompanyList[index].id!);
+                                        dashboardController.changeWidget(
+                                            value: 2);
+                                      },
+                                      child: Text(
+                                        'View page',
+                                        style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: AdtipColors.lightBlue),
                                       ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Get.to(
-                                            () => EditCompanyPage(
-                                              companyData: companyList![index],
-                                            ),
-                                          );
-                                        },
-                                        child: Text(
-                                          'Edit',
-                                          style: GoogleFonts.poppins(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 14,
-                                              color: AdtipColors.grey6666),
-                                        ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        controller.changeCompanyIndex(
+                                            index: index,
+                                            companyId: controller
+                                                .fetchedCompanyList[index].id!);
+                                        dashboardController.changeWidget(
+                                            value: 3);
+                                      },
+                                      child: Text(
+                                        'Edit',
+                                        style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: AdtipColors.grey6666),
                                       ),
-                                      IconButton(
-                                        onPressed: () async {
-                                          // await _shareQrCode(
-                                          //     companyData.id ?? 0);
-                                          // setState(() {
-                                          //   qrShow = true;
-                                          // });
-                                          // controller
-                                          //     .generateCompanyQR(companyData.id!);
-                                        },
-                                        icon: const Icon(Icons.share),
-                                      )
-                                    ],
-                                  )
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        // print('company id ${controller
+                                        //     .fetchedCompanyList[index].id!}');
+                                        // controller.fetchedCompanyList
+                                        //     .removeWhere((element) =>
+                                        //         element.id ==
+                                        //         controller
+                                        //             .fetchedCompanyList[index]
+                                        //             .id!);
+                                        controller.deleteCompany(
+                                            companyId: controller
+                                                .fetchedCompanyList[index].id!);
+                                        controller.fetchCompanyList();
+                                      },
+                                      child: Text(
+                                        'Delete',
+                                        style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: AdtipColors.grey6666),
+                                      ),
+                                    ),
+                                  ],
+                                )
                               ],
                             ),
                           )

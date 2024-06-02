@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:adtip_web_3/modules/dashboard/controller/dashboard_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,14 +13,14 @@ import '../../../helpers/utils/utils.dart';
 import '../../../widgets/button/c_login_button.dart';
 import '../../../widgets/icon/c_icon_image.dart';
 import '../../../widgets/text/loader.dart';
+import '../../createCompany/controller/create_company_controller.dart';
 import '../controller/post_controller.dart';
 import '../widgets/c_text_form_filed_underline.dart';
 import 'widget/button/drop.dart';
 import 'widget/button/drop_controller.dart';
 
 class AddPostPage extends StatefulWidget {
-  final String companyId;
-  const AddPostPage({super.key, required this.companyId});
+  const AddPostPage({super.key});
 
   @override
   State<AddPostPage> createState() => _AddPostPageState();
@@ -30,9 +32,11 @@ class _AddPostPageState extends State<AddPostPage> {
   TextEditingController postNameC = TextEditingController();
   TextEditingController postDesC = TextEditingController();
   TextEditingController websiteC = TextEditingController();
+  final companyController = Get.put(CreateCompanyController());
 
   DropControllerBottons dropControllerBottom = Get.put(DropControllerBottons());
   final PostController postController = Get.put(PostController());
+  final dashboardController = Get.put(DashboardController());
   @override
   void initState() {
     super.initState();
@@ -43,12 +47,11 @@ class _AddPostPageState extends State<AddPostPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AdtipColors.white,
-      appBar: appBar(),
-      body: SingleChildScrollView(
+    return SizedBox(
+      width: 500,
+      child: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           child: Form(
             key: _formKey,
             child: Column(
@@ -72,7 +75,7 @@ class _AddPostPageState extends State<AddPostPage> {
                     controller: websiteC,
                     title: 'Website Link (Optional)',
                     hintText: 'Enter Website Link'),
-                Text('Target button to displays',
+                const Text('Target button to displays',
                     style: TextStyle(fontSize: 14)),
                 Obx(
                   () => TextFormField(
@@ -81,7 +84,7 @@ class _AddPostPageState extends State<AddPostPage> {
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (_) => DropDownBottons(),
+                        builder: (_) => const DropDownBottons(),
                       );
                     },
                     validator: (value) {
@@ -96,17 +99,17 @@ class _AddPostPageState extends State<AddPostPage> {
                     decoration: InputDecoration(
                         hintText: 'Target button to display',
                         hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                        suffixIcon: Icon(
+                        suffixIcon: const Icon(
                           Icons.keyboard_arrow_down,
                           color: Colors.grey,
                         )),
                   ),
                 ),
                 _buildImageList(),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                       child: ListTile(
                         title: Text(
                           'Post Name',
@@ -138,7 +141,7 @@ class _AddPostPageState extends State<AddPostPage> {
                         onPressed: () {
                           pickImage();
                         },
-                        child: Text(
+                        child: const Text(
                           'Upload Images',
                           style: TextStyle(color: Colors.white),
                         ),
@@ -146,15 +149,34 @@ class _AddPostPageState extends State<AddPostPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Obx(
                   () => CLoginButton(
                     isLoading: postController.loading.value,
                     title: 'Save',
                     onTap: () {
                       if (_formKey.currentState!.validate()) {
+                        if (imageList.isEmpty) {
+                          Utils.showErrorMessage('Please upload image');
+                          return;
+                        }
+                        if (websiteC.text.isNotEmpty) {
+                          bool isValid = Utils.isValidUrl(websiteC.text);
+                          if (!isValid) {
+                            if (kDebugMode) {
+                              print('invalid url');
+                            }
+                            Utils.showErrorMessage(
+                                'Please add valid website link');
+                            return;
+                          }
+                          if (kDebugMode) {
+                            print('valid url');
+                          }
+                        }
                         postController.addPost(
-                            companyId: widget.companyId,
+                            companyId: companyController.selectedCompanyId.value
+                                .toString(),
                             postName: postNameC.text,
                             buttonId: dropControllerBottom.selectData.value.id
                                 .toString(),
@@ -171,7 +193,7 @@ class _AddPostPageState extends State<AddPostPage> {
                 CLoginButton(
                   title: 'No Thanks',
                   onTap: () {
-                    Get.back();
+                    dashboardController.changeWidget(value: 2);
                   },
                   buttonColor: AdtipColors.white,
                   textColor: AdtipColors.black,
@@ -189,33 +211,13 @@ class _AddPostPageState extends State<AddPostPage> {
     final picker = ImagePicker();
 
     try {
-      final pickedFile = await picker.pickMedia();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
       if (pickedFile != null) {
-        bool isImage = pickedFile.path
-            .toLowerCase()
-            .contains(RegExp(r'\.(jpeg|jpg|gif|png)'));
-        bool isVideo = pickedFile.path
-            .toLowerCase()
-            .contains(RegExp(r'\.(mp4|mov|avi|mkv)'));
+        // Handle the picked image, e.g., display it in an Image widget
+        print('Image picked: ${pickedFile}');
         showLoaderDialog(context, Colors.blue);
-        if (isImage) {
-          String imageUrl = await Utils.uploadImageToAwsAmplify(
-              path: pickedFile.path, folderName: 'CompanyPostsImages');
-          setState(() {
-            imageList.add(imageUrl);
-          });
-        } else if (isVideo) {
-          print('picked is video');
-          String videoUrl = await Utils.uploadVideoToAwsAmplify(
-              path: pickedFile.path, folderName: 'CompanyPostsVideos');
-          setState(() {
-            imageList.add(videoUrl);
-          });
-        }
-
-        // await uploadImagesAWS(pickedFile);
-
+        await uploadImagesAWS(pickedFile.path);
         Navigator.of(context).pop();
       } else {
         print('No image selected.');
@@ -224,6 +226,69 @@ class _AddPostPageState extends State<AddPostPage> {
       print('Error picking image: $e');
     }
   }
+
+  uploadImagesAWS(filepath) async {
+    var myUrl = await Utils.uploadImageToAwsAmplify(
+        path: filepath, folderName: 'Product Images');
+    setState(() {
+      imageList.add(myUrl);
+    });
+    // var myUrl = (await AwsS3.uploadFile(
+    //       acl: ACL.bucket_owner_full_control,
+    //       accessKey: "AKIAWOVUZ5ONNYTS5G7O",
+    //       secretKey: "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",
+    //       file: File(filepath?.path ?? ""),
+    //       bucket: "adtipbucket",
+    //       region: "ap-south-1",
+    //       destDir: 'images',
+    //     )) ??
+    //     "";
+    // print(myUrl);
+    // setState(() {
+    //   imageList.add(myUrl);
+    // });
+    // return myUrl;
+  }
+
+  // Future<void> pickImage() async {
+  //   final picker = ImagePicker();
+  //
+  //   try {
+  //     final pickedFile = await picker.pickMedia();
+  //
+  //     if (pickedFile != null) {
+  //       bool isImage = pickedFile.path
+  //           .toLowerCase()
+  //           .contains(RegExp(r'\.(jpeg|jpg|gif|png)'));
+  //       bool isVideo = pickedFile.path
+  //           .toLowerCase()
+  //           .contains(RegExp(r'\.(mp4|mov|avi|mkv)'));
+  //       showLoaderDialog(context, Colors.blue);
+  //       if (isImage) {
+  //         String imageUrl = await Utils.uploadImageToAwsAmplify(
+  //             path: pickedFile.path, folderName: 'CompanyPostsImages');
+  //         setState(() {
+  //           imageList.add(imageUrl);
+  //         });
+  //       } else if (isVideo) {
+  //         print('picked is video');
+  //         String videoUrl = await Utils.uploadVideoToAwsAmplify(
+  //             path: pickedFile.path, folderName: 'CompanyPostsVideos');
+  //         setState(() {
+  //           imageList.add(videoUrl);
+  //         });
+  //       }
+  //
+  //       // await uploadImagesAWS(pickedFile);
+  //
+  //       Navigator.of(context).pop();
+  //     } else {
+  //       print('No image selected.');
+  //     }
+  //   } catch (e) {
+  //     print('Error picking image: $e');
+  //   }
+  // }
 
   AppBar appBar() {
     return AppBar(
@@ -235,10 +300,10 @@ class _AddPostPageState extends State<AddPostPage> {
             fontWeight: FontWeight.w700,
             color: AdtipColors.black),
       ),
-      actions: [
+      actions: const [
         Padding(
           padding: EdgeInsets.only(right: 24.0),
-          child: const CIconImage(
+          child: CIconImage(
             image: AdtipAssets.SUPPORT_AGENT_ICON,
           ),
         )
@@ -289,7 +354,7 @@ class _AddPostPageState extends State<AddPostPage> {
                           onTap: () {
                             _removeImage(index);
                           },
-                          child: CircleAvatar(
+                          child: const CircleAvatar(
                             backgroundColor: Colors.red,
                             radius: 12,
                             child: Icon(

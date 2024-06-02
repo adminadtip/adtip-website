@@ -55,7 +55,7 @@ class _CreateCompanyPageState extends State<CreateCompanyPage> {
   }
 
   void fetchCompaniesList(String value) async {
-    companyList = await controller.fetchCompanyList(_userId);
+    companyList = await controller.fetchCompanyList();
     if (companyList != null) {
       var result = companyList!.firstWhere(
           (element) =>

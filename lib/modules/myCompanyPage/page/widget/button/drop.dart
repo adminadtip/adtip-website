@@ -16,73 +16,83 @@ class _DropDownBottonsState extends State<DropDownBottons> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      contentPadding: EdgeInsets.zero,
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            SizedBox(height: 20),
-            Obx(
-              () => skipVideoController.loading.value
-                  ? Center(child: CircularProgressIndicator())
-                  : ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: skipVideoController.buttonListData.length,
-                      itemBuilder: (context, i) {
-                        return ListTile(
-                            onTap: () {
-                              skipVideoController.setSelect(
-                                  skipVideoController.buttonListData[i]);
-                            },
-                            title: Text(
-                                skipVideoController.buttonListData[i].name ??
-                                    ""),
-                            trailing: Obx(
-                              () => Visibility(
-                                visible: skipVideoController.checkIsSelected(
-                                    skipVideoController.buttonListData[i]),
-                                replacement:
-                                    Icon(Icons.check_box_outline_blank),
-                                child: Icon(
-                                  Icons.check_box,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ));
-                      }),
-            ),
-          ],
+    return SizedBox(
+      height: 400,
+      width: 400,
+      child: AlertDialog(
+        contentPadding: EdgeInsets.zero,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const SizedBox(height: 20),
+              Obx(
+                () => skipVideoController.loading.value
+                    ? const Center(child: CircularProgressIndicator())
+                    : SizedBox(
+                        height: 300,
+                        width: 400,
+                        child: ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount:
+                                skipVideoController.buttonListData.length,
+                            itemBuilder: (context, i) {
+                              return ListTile(
+                                  onTap: () {
+                                    skipVideoController.setSelect(
+                                        skipVideoController.buttonListData[i]);
+                                  },
+                                  title: Text(skipVideoController
+                                          .buttonListData[i].name ??
+                                      ""),
+                                  trailing: Obx(
+                                    () => Visibility(
+                                      visible: skipVideoController
+                                          .checkIsSelected(skipVideoController
+                                              .buttonListData[i]),
+                                      replacement: const Icon(
+                                          Icons.check_box_outline_blank),
+                                      child: const Icon(
+                                        Icons.check_box,
+                                        color: Colors.blue,
+                                      ),
+                                    ),
+                                  ));
+                            }),
+                      ),
+              ),
+            ],
+          ),
         ),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.blue, fontSize: 18),
+                ),
+              ),
+              const SizedBox(width: 20),
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  'Done',
+                  style: TextStyle(color: Colors.blue, fontSize: 18),
+                ),
+              )
+            ],
+          )
+        ],
       ),
-      actions: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            InkWell(
-              onTap: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                "Cancel",
-                style: TextStyle(color: Colors.blue, fontSize: 18),
-              ),
-            ),
-            SizedBox(width: 20),
-            InkWell(
-              onTap: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'Done',
-                style: TextStyle(color: Colors.blue, fontSize: 18),
-              ),
-            )
-          ],
-        )
-      ],
     );
   }
 }

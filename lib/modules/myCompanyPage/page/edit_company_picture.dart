@@ -1,3 +1,5 @@
+import 'package:adtip_web_3/helpers/utils/utils.dart';
+import 'package:adtip_web_3/modules/dashboard/controller/dashboard_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -9,11 +11,11 @@ import '../../../widgets/button/c_login_button.dart';
 import '../../createCompany/model/companyDetail.dart';
 import '../../createCompany/widget/appbar_widget.dart';
 import '../controller/edit_company_controller.dart';
+import '../controller/my_company_controller.dart';
 import 'edit_direct_button_page.dart';
 
 class CompanyEditImage extends StatefulWidget {
-  final CompanyDetail companyData;
-  const CompanyEditImage({super.key, required this.companyData});
+  const CompanyEditImage({super.key});
 
   @override
   State<CompanyEditImage> createState() => _CompanyEditImageState();
@@ -22,16 +24,15 @@ class CompanyEditImage extends StatefulWidget {
 class _CompanyEditImageState extends State<CompanyEditImage> {
   EditCompanyController editCompanyController =
       Get.put(EditCompanyController());
+  final myCompanyController = Get.put(MyCompanyController());
+  final dashboardController = Get.put(DashboardController());
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      backgroundColor: Color(0xffF5F7FF),
-      appBar: appBar(
-          title: "Edit Company Page",
-          showIcon: false,
-          textColor: AdtipColors.black),
-      body: SingleChildScrollView(
+    return SizedBox(
+      width: 500,
+      child: SingleChildScrollView(
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -45,24 +46,25 @@ class _CompanyEditImageState extends State<CompanyEditImage> {
                       () => Container(
                         height: 300,
                         width: size.width,
-                        margin: EdgeInsets.all(15),
+                        margin: const EdgeInsets.all(15),
                         child: ClipPath(
                             clipper: DiagonalClipper(),
                             clipBehavior: Clip.antiAliasWithSaveLayer,
-                            child: editCompanyController
-                                        .imageBanner!.value.path ==
-                                    ''
-                                ? widget.companyData.coverImage == null
+                            child: editCompanyController.coverImage.value == ''
+                                ? myCompanyController
+                                            .company.value?.coverImage ==
+                                        null
                                     ? Image.asset(
                                         AdtipAssets.COMPANY_BANNER_IMAGE,
                                         fit: BoxFit.fill,
                                       )
                                     : Image.network(
-                                        widget.companyData.coverImage!,
+                                        myCompanyController
+                                            .company.value!.coverImage!,
                                         fit: BoxFit.cover,
                                       )
-                                : Image.file(
-                                    editCompanyController.imageBanner!.value,
+                                : Image.network(
+                                    editCompanyController.coverImage.value,
                                     fit: BoxFit.fill,
                                   )),
                       ),
@@ -76,8 +78,8 @@ class _CompanyEditImageState extends State<CompanyEditImage> {
                         },
                         child: Container(
                           alignment: Alignment.center,
-                          padding: EdgeInsets.all(10),
-                          margin: EdgeInsets.all(15),
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.all(15),
                           width: 75,
                           height: 40,
                           decoration: BoxDecoration(
@@ -99,11 +101,11 @@ class _CompanyEditImageState extends State<CompanyEditImage> {
                     ),
                   ],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 100,
                 ),
                 Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20),
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: CLoginButton(
                       title: 'Next',
                       isLoading: false,
@@ -111,32 +113,32 @@ class _CompanyEditImageState extends State<CompanyEditImage> {
                       textColor: AdtipColors.white,
                       showImage: false,
                       onTap: () {
-                        if (editCompanyController.imageBanner!.value.path !=
-                                    '' &&
-                                editCompanyController
-                                        .imageCompanyProfile!.value.path !=
-                                    '' ||
-                            widget.companyData.coverImage != null &&
-                                widget.companyData.profileFilename != null) {
-                          Get.to(() => EditDirectButtonPage(
-                                companyData: widget.companyData,
-                              ));
-                        } else {
-                          editCompanyController.showMessage(
-                              "Please Select Image",
-                              isError: true);
-                        }
+                        dashboardController.changeWidget(value: 6);
+                        // if (editCompanyController.imageBanner!.value.path !=
+                        //             '' &&
+                        //         editCompanyController
+                        //                 .imageCompanyProfile!.value.path !=
+                        //             '' ||
+                        //     myCompanyController.company.value?.coverImage !=
+                        //             null &&
+                        //         myCompanyController
+                        //                 .company.value?.profileFilename !=
+                        //             null) {
+                        //
+                        // } else {
+                        //   Utils.showErrorMessage('Please select image');
+                        // }
                       }),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  margin: EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: InkWell(
                     onTap: () {
-                      Get.back();
+                      dashboardController.changeWidget(value: 4);
                     },
                     child: Container(
                         height: 45,
@@ -155,7 +157,7 @@ class _CompanyEditImageState extends State<CompanyEditImage> {
                         )),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 50,
                 ),
               ],
@@ -169,29 +171,34 @@ class _CompanyEditImageState extends State<CompanyEditImage> {
                     () => CircleAvatar(
                         radius: 70.0,
                         backgroundColor: Colors.transparent,
-                        backgroundImage: editCompanyController
-                                    .imageCompanyProfile!.value.path ==
-                                ''
-                            ? (widget.companyData.profileImage == null
-                                ? AssetImage(AdtipAssets.COMPANY_PROFILE_IMAGE)
-                                : AssetImage(AdtipAssets.COMPANY_PROFILE_IMAGE)
-                                    as ImageProvider<Object>?)
-                            : FileImage(editCompanyController
-                                .imageCompanyProfile!.value),
-                        child: editCompanyController
-                                    .imageCompanyProfile!.value.path ==
-                                ''
-                            ? (widget.companyData.profileImage == null
-                                ? Offstage()
+                        backgroundImage:
+                            editCompanyController.profileImage.value ==
+                                    ''
+                                ? (myCompanyController
+                                            .company.value?.profileImage ==
+                                        null
+                                    ? const AssetImage(
+                                        AdtipAssets.COMPANY_PROFILE_IMAGE)
+                                    : const AssetImage(
+                                            AdtipAssets.COMPANY_PROFILE_IMAGE)
+                                        as ImageProvider<Object>?)
+                                : NetworkImage(
+                                    editCompanyController.profileImage.value),
+                        child: editCompanyController.profileImage.value == ''
+                            ? (myCompanyController
+                                        .company.value?.profileImage ==
+                                    null
+                                ? const Offstage()
                                 : CircleAvatar(
                                     radius: 70.0,
                                     backgroundImage: NetworkImage(
-                                      widget.companyData.profileImage!,
+                                      myCompanyController
+                                          .company.value!.profileImage!,
                                     ),
                                   ))
-                            : Offstage()),
+                            : const Offstage()),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   GestureDetector(

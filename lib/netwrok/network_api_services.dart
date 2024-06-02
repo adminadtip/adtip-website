@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -30,11 +31,13 @@ class NetworkApiServices extends BaseApiServices {
                 'Bearer ${LocalPrefs().getStringPref(key: SharedPreferenceKey.UserLoggedIn)}'
           }).timeout(const Duration(seconds: 250));
 
-          print('------URL-------');
-          print("GETURL ${response.request?.url}");
-          print(response.statusCode);
-          print('------response-------');
-          print("GETResponse  ${response.body}");
+          if (kDebugMode) {
+            print('------URL-------');
+            print("GETURL ${response.request?.url}");
+            print(response.statusCode);
+            print('------response-------');
+            print("GETResponse  ${response.body}");
+          }
 
           return returnResponse(response);
         } on SocketException {
@@ -44,8 +47,8 @@ class NetworkApiServices extends BaseApiServices {
         } on Exception catch (e) {
           throw Exception(e);
         }
-      } catch (error, stackTrace) {
-        rethrow;
+      } catch (error) {
+        throw (error.toString());
       }
     } else {
       Utils.showErrorMessage('No internet connection!');
@@ -60,20 +63,27 @@ class NetworkApiServices extends BaseApiServices {
       try {
         final uri = Uri.parse(url);
         try {
-          print("PostUrl $uri");
-          print("----PostReq-- $data------");
+          if (kDebugMode) {
+            print("PostUrl $uri");
+            print("----PostReq-- $data------");
+          }
+
           final response =
               await http.post(uri, body: jsonEncode(data), headers: {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             "Authorization":
                 'Bearer ${LocalPrefs().getStringPref(key: SharedPreferenceKey.UserLoggedIn)}'
-          }).timeout(Duration(seconds: 250));
-          print('------URL-------');
-          print("PostURL ${response.request?.url}");
-          print(response.statusCode);
-          print('------response-------');
-          print("PostResponse  ${response.body}");
+          }).timeout(const Duration(seconds: 250));
+
+          if (kDebugMode) {
+            print('------URL-------');
+            print("PostURL ${response.request?.url}");
+            print(response.statusCode);
+            print('------response-------');
+            print("PostResponse  ${response.body}");
+          }
+
           return returnResponse(response);
         } on SocketException {
           throw InternetException();
@@ -82,11 +92,14 @@ class NetworkApiServices extends BaseApiServices {
         } on Exception {
           throw Exception();
         }
-      } catch (error, stackTrace) {
-        print('------ERROR-------');
-        print(error);
-        print(stackTrace);
-        // Logger.log(error, stackTrace: stackTrace);
+      } catch (error) {
+        if (kDebugMode) {
+          print('------ERROR-------');
+          print(error);
+          // Logger.log(error, stackTrace: stackTrace);
+        }
+        throw (error.toString());
+
         rethrow;
       }
     } else {
@@ -96,17 +109,19 @@ class NetworkApiServices extends BaseApiServices {
 }
 
 dynamic returnResponse(http.Response response) {
+  String? message = json.decode(response.body)['message'];
   switch (response.statusCode) {
     case 200:
       if (json.decode(response.body)['status'] == 500) {
-        print('------URL500-------');
-        print("${response.request?.url} URL500");
-
-        //Get.to(PhoneLoginPage());
+        if (kDebugMode) {
+          print('------URL500-------');
+          print("${response.request?.url} URL500");
+        }
       }
       return json.decode(response.body);
     case 400:
-      throw BadRequest();
+      // throw BadRequest();
+      throw (message ?? 'Something went wrong, please try again.');
     case 401:
       throw Unauthorized();
     case 403:
@@ -116,7 +131,8 @@ dynamic returnResponse(http.Response response) {
     case 408:
       throw RequestTimeOut();
     case 500:
-      throw InternalServerError();
+      // throw InternalServerError();
+      throw (message ?? 'Something went wrong, please try again.');
     case 502:
       throw BadGateway();
     default:

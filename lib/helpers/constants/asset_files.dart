@@ -37,7 +37,7 @@ class AdtipAssets {
   static const MESSAGE_ICON = 'assets/icon/message_outline.png';
 
   static const LIKE_ICON = 'assets/svg/like-thumb_up.svg';
-  static const ARROW_UP = 'assets/icon/arrow_up.png';
+  static const ARROW_UP = 'assets/icons/arrow_up.png';
   static const SETTINGS_ICON = 'assets/svg/Group.svg';
   static const WALLET_ICON = 'assets/svg/account_balance_wallet.svg';
   static const PASSBOOK_ICON = 'assets/svg/book.svg';

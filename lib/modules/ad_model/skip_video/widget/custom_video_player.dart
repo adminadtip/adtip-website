@@ -22,6 +22,16 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
   }
 
   @override
+  void didUpdateWidget(CustomVideoPlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.videoUrl != widget.videoUrl) {
+      // Handle video URL change (e.g., reload the video)
+      print('Video URL changed: ${widget.videoUrl}');
+      initializeVideo();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
         height: widget.height ?? 160,
@@ -31,7 +41,8 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
   }
 
   void initializeVideo() {
-    videoPlayerController = VideoPlayerController.network(widget.videoUrl);
+    videoPlayerController =
+        VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
 
     chewieController = ChewieController(
         videoPlayerController: videoPlayerController,

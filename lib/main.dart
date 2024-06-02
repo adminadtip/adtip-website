@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:html';
 import 'package:adtip_web_3/modules/authentication/pages/landing_page.dart';
 import 'package:adtip_web_3/modules/dashboard/pages/dashboard_page.dart';
+import 'package:adtip_web_3/modules/dashboard/pages/privacy_page.dart';
+import 'package:adtip_web_3/modules/dashboard/pages/terms_service_page.dart';
+import 'package:adtip_web_3/modules/qr_ad_display/controller/qr_ad_controller.dart';
 import 'package:adtip_web_3/routes/app_pages.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -13,6 +16,8 @@ import 'package:url_strategy/url_strategy.dart';
 import 'amplifyconfiguration.dart';
 import 'helpers/local_database/local_prefs.dart';
 import 'helpers/local_database/sharedpref_key.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 Future<void> _configureAmplify() async {
   try {
@@ -30,6 +35,9 @@ Future<void> _configureAmplify() async {
 void main() async {
   await _configureAmplify();
   setPathUrlStrategy();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await LocalPrefs().init();
   runApp(const MyApp());
 }
@@ -43,12 +51,14 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String? token;
+  final qrCodeController = Get.put(QrCodeAdDisplayController());
 
   @override
   void initState() {
     // TODO: implement initState
-    boardingShow();
+
     super.initState();
+    boardingShow();
   }
 
   void openAppUrl() {
@@ -71,16 +81,15 @@ class _MyAppState extends State<MyApp> {
   void boardingShow() async {
     final uri = Uri.parse(window.location.href);
     final pathSegments = uri.pathSegments;
-    print('path segment ${pathSegments.first}');
+
+    token = LocalPrefs().getStringPref(
+      key: SharedPreferenceKey.UserLoggedIn,
+    );
     if (pathSegments.isNotEmpty && pathSegments.first == 'mob') {
-      Future.delayed(const Duration(seconds: 1), redirectToPlayStore);
-    } else {
-      // Redirect to a different page if the path is not /mob/
-      // redirectToDifferentPage();
-      token = LocalPrefs().getStringPref(
-        key: SharedPreferenceKey.UserLoggedIn,
-      );
-    }
+      // Future.delayed(const Duration(seconds: 1), redirectToPlayStore);
+      qrCodeController.getQRCodeDetails(
+          str: window.location.href, context: context);
+    } else {}
 
     print('token $token');
   }
@@ -96,7 +105,11 @@ class _MyAppState extends State<MyApp> {
       ),
       // home: DashboardPage(),
       home: token == null ? const LandingPage() : const DashboardPage(),
-      // getPages: AppPages.routes,
+      //getPages: AppPages.routes,
+      routes: {
+        '/privacy': (context) => const PrivacyPolicyText(),
+        '/terms': (context) => const TermsOfServiceText(),
+      },
     );
   }
 }

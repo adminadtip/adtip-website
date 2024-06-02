@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:adtip_web_3/helpers/utils/utils.dart';
+import 'package:adtip_web_3/modules/ad_model/controllers/ad_models_controller.dart';
 import 'package:adtip_web_3/modules/ad_model/page/success_screen.dart';
+import 'package:adtip_web_3/modules/dashboard/controller/dashboard_controller.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,23 +21,23 @@ import '../skip_video/widget/custom_video_player.dart';
 import 'package:flutter_razorpay_web/flutter_razorpay_web.dart';
 
 class CheckOutScreen extends StatefulWidget {
-  final String tax;
-  final String loc;
-  final String website;
-  final String des;
-  final int orderValue;
-  final String campaign;
-  final String name;
+  // final String tax;
+  // final String loc;
+  // final String website;
+  // final String des;
+  // final int orderValue;
+  // final String campaign;
+  // final String name;
 
   const CheckOutScreen({
     super.key,
-    required this.des,
-    required this.loc,
-    required this.tax,
-    required this.website,
-    required this.orderValue,
-    required this.campaign,
-    required this.name,
+    // required this.des,
+    // required this.loc,
+    // required this.tax,
+    // required this.website,
+    // required this.orderValue,
+    // required this.campaign,
+    // required this.name,
   });
 
   @override
@@ -52,410 +54,414 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   double finalDelCharge = 0;
   double couponDiscount = 0;
   double delCharge = 0;
+  final adModelController = Get.put(AdModelsController());
+  final dashboardController = Get.put(DashboardController());
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return Scaffold(
-      body: Center(
-        child: SizedBox(
-          width: 500,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.only(left: 20, right: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return SizedBox(
+      width: 500,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(left: 20, right: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              adModelController.title.value,
+              style: const TextStyle(fontSize: 20),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Card(
+                child: Row(
               children: [
-                const Text("Ordering Ad model",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    )),
-                const SizedBox(height: 5),
-                Card(
-                    child: Row(
+                if (skipVideoController.videoUrl.value != null ||
+                    skipVideoController.videoUrl.value != "")
+                  //   FutureBuilder(
+                  //       future: skipVideoController
+                  //           .genThumbnailFile(skipVideoController.videoUrl.value),
+                  //       builder: (context, snapshot) {
+                  //         if (snapshot.hasData) {
+                  //           return Image.file(
+                  //             snapshot.data!,
+                  //             width: 90,
+                  //             height: 120,
+                  //             fit: BoxFit.fill,
+                  //           );
+                  //         }
+                  //         return const SizedBox(
+                  //             width: 90,
+                  //             height: 120,
+                  //             child: Column(
+                  //               mainAxisAlignment: MainAxisAlignment.center,
+                  //               children: [
+                  //                 CircularProgressIndicator(),
+                  //               ],
+                  //             ));
+                  //       })
+                  // else
+                  CachedNetworkImage(
+                    imageUrl: skipVideoController.imageUrl.value,
+                    width: 90,
+                    height: 120,
+                    fit: BoxFit.fill,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) => Image.asset(
+                      'assets/images/noImage.jpg',
+                      width: 90,
+                      height: 120,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                // Image.asset(
+                //   'assets/extra/Thumbnail_(2).png',
+                //   width: 70.w,
+                //   height: 110.h,
+                //   fit: BoxFit.cover,
+                // ),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (skipVideoController.videoUrl.value != null ||
-                        skipVideoController.videoUrl.value != "")
-                      //   FutureBuilder(
-                      //       future: skipVideoController
-                      //           .genThumbnailFile(skipVideoController.videoUrl.value),
-                      //       builder: (context, snapshot) {
-                      //         if (snapshot.hasData) {
-                      //           return Image.file(
-                      //             snapshot.data!,
-                      //             width: 90,
-                      //             height: 120,
-                      //             fit: BoxFit.fill,
-                      //           );
-                      //         }
-                      //         return const SizedBox(
-                      //             width: 90,
-                      //             height: 120,
-                      //             child: Column(
-                      //               mainAxisAlignment: MainAxisAlignment.center,
-                      //               children: [
-                      //                 CircularProgressIndicator(),
-                      //               ],
-                      //             ));
-                      //       })
-                      // else
-                      CachedNetworkImage(
-                        imageUrl: skipVideoController.imageUrl.value,
-                        width: 90,
-                        height: 120,
-                        fit: BoxFit.fill,
-                        placeholder: (context, url) =>
-                            const Center(child: CircularProgressIndicator()),
-                        errorWidget: (context, url, error) => Image.asset(
-                          'assets/images/noImage.jpg',
-                          width: 90,
-                          height: 120,
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                    // Image.asset(
-                    //   'assets/extra/Thumbnail_(2).png',
-                    //   width: 70.w,
-                    //   height: 110.h,
-                    //   fit: BoxFit.cover,
-                    // ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 10),
+                    Text(adModelController.compaignName.value,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                        )),
+                    Row(
                       children: [
-                        const SizedBox(height: 10),
-                        Text(widget.campaign,
+                        Text("₹${adModelController.adValue.value}",
                             style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
                             )),
-                        Row(
-                          children: [
-                            Text("₹${widget.orderValue}",
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                )),
-                            const SizedBox(width: 5),
-                            const Text(
-                              "Celebration Status",
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            )
-                          ],
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(
-                              left: 10, top: 10, bottom: 15),
-                          height: .5,
-                          color: Colors.grey,
-                          width: 200,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    contentPadding: EdgeInsets.zero,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(0),
-                                    ),
-                                    insetPadding: const EdgeInsets.only(
-                                      left: 10,
-                                      right: 10,
-                                    ),
-                                    content: SingleChildScrollView(
-                                      child: SizedBox(
-                                        width: size.width * 0.1,
-                                        height: size.height * 0.7,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            InkWell(
-                                                onTap: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Padding(
-                                                  padding: EdgeInsets.all(8.0),
-                                                  child: Icon(Icons.cancel),
-                                                )),
-                                            const SizedBox(height: 10),
-                                            if (skipVideoController
-                                                    .imageUrl.value !=
-                                                "")
-                                              CachedNetworkImage(
-                                                imageUrl: skipVideoController
-                                                    .imageUrl.value,
-                                                fit: BoxFit.fitHeight,
-                                                placeholder: (context, url) =>
-                                                    const Center(
-                                                        child:
-                                                            CircularProgressIndicator()),
-                                                errorWidget:
-                                                    (context, url, error) =>
-                                                        Image.asset(
-                                                  'assets/images/noImage.jpg',
-                                                ),
-                                              ),
-                                            CustomVideoPlayer(
-                                                height: 210,
-                                                videoUrl: skipVideoController
-                                                    .videoUrl.value)
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                });
-                          },
-                          child: const Text("preview",
-                              style: TextStyle(
-                                color: Colors.blue,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              )),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    )
-                  ],
-                )),
-                const SizedBox(height: 20),
-                const Text("Payment Information",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    )),
-                const SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text('Selected: ',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 13)),
-                            Text('UPI', style: TextStyle(fontSize: 11))
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text('Other: ',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 13)),
-                            Text('Razorpay, paypal, Visa',
-                                style: TextStyle(fontSize: 11))
-                          ],
+                        const SizedBox(width: 5),
+                        const Text(
+                          "Celebration Status",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                          ),
                         )
                       ],
                     ),
-                    Icon(Icons.arrow_forward_ios_outlined,
-                        color: Colors.grey.shade500)
-                  ],
-                ),
-                const SizedBox(height: 20),
-                InkWell(
-                  onTap: () {
-                    // Get.to(CouponScreen())?.then((value) {
-                    //   setState(() {
-                    //     couponCode = value.couponCode;
-                    //     coupon = value.couponDiscount;
-                    //   });
-                    //   print(value.couponCode);
-                    // });
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("Apply coupon",
+                    Container(
+                      margin:
+                          const EdgeInsets.only(left: 10, top: 10, bottom: 15),
+                      height: .5,
+                      color: Colors.grey,
+                      width: 200,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                contentPadding: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(0),
+                                ),
+                                insetPadding: const EdgeInsets.only(
+                                  left: 10,
+                                  right: 10,
+                                ),
+                                content: SingleChildScrollView(
+                                  child: SizedBox(
+                                    width: size.width * 0.1,
+                                    height: size.height * 0.7,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        InkWell(
+                                            onTap: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Icon(Icons.cancel),
+                                            )),
+                                        const SizedBox(height: 10),
+                                        if (skipVideoController
+                                                .imageUrl.value !=
+                                            "")
+                                          CachedNetworkImage(
+                                            imageUrl: skipVideoController
+                                                .imageUrl.value,
+                                            fit: BoxFit.fitHeight,
+                                            placeholder: (context, url) =>
+                                                const Center(
+                                                    child:
+                                                        CircularProgressIndicator()),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Image.asset(
+                                              'assets/images/noImage.jpg',
+                                            ),
+                                          ),
+                                        CustomVideoPlayer(
+                                            height: 210,
+                                            videoUrl: skipVideoController
+                                                .videoUrl.value)
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            });
+                      },
+                      child: const Text("preview",
                           style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
+                            color: Colors.blue,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           )),
-                      Icon(
-                        Icons.arrow_forward_ios_outlined,
-                        color: Colors.grey.shade500,
-                        size: 20,
-                      )
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                )
+              ],
+            )),
+            const SizedBox(height: 20),
+            const Text("Payment Information",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                )),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        if (couponCode != null)
-                          Row(
-                            children: [
-                              const Text('Added: ',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13)),
-                              Text(couponCode ?? "",
-                                  style: const TextStyle(fontSize: 11))
-                            ],
-                          ),
-                        // Row(
-                        //   children: [
-                        //     Text('More: ',
-                        //         style: TextStyle(
-                        //             fontWeight: FontWeight.bold,
-                        //             fontSize: 13.sp)),
-                        //     Text('HDFC30, NEW50, FIRST70',
-                        //         style: TextStyle(fontSize: 11.sp))
-                        //   ],
-                        // )
+                        Text('Selected: ',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
+                        Text('UPI', style: TextStyle(fontSize: 11))
                       ],
                     ),
+                    Row(
+                      children: [
+                        Text('Other: ',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
+                        Text('Razorpay, paypal, Visa',
+                            style: TextStyle(fontSize: 11))
+                      ],
+                    )
                   ],
                 ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Icon(Icons.arrow_forward_ios_outlined,
+                    color: Colors.grey.shade500)
+              ],
+            ),
+            const SizedBox(height: 20),
+            InkWell(
+              onTap: () {
+                // Get.to(CouponScreen())?.then((value) {
+                //   setState(() {
+                //     couponCode = value.couponCode;
+                //     coupon = value.couponDiscount;
+                //   });
+                //   print(value.couponCode);
+                // });
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Apply coupon",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      )),
+                  Icon(
+                    Icons.arrow_forward_ios_outlined,
+                    color: Colors.grey.shade500,
+                    size: 20,
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("GST",
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w400,
-                        )),
-                    CupertinoSwitch(
-                      value: _switchValue,
-                      onChanged: (value) {
-                        setState(() {
-                          _switchValue = value;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                const Text("Payment details",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    )),
-                const SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Order Value', style: TextStyle(fontSize: 13)),
-                    Text('₹ ${widget.orderValue}',
-                        style: const TextStyle(
-                            fontSize: 11, fontWeight: FontWeight.bold))
-                  ],
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                        'Delivery charge ${coupon != 0 ? ((coupon * 30) / 100) : 30}%',
-                        style: const TextStyle(fontSize: 13)),
-                    Text('₹ ${finalDelCharge.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                            fontSize: 11, fontWeight: FontWeight.bold))
-                  ],
-                ),
-                const SizedBox(height: 5),
-                _switchValue
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    if (couponCode != null)
+                      Row(
                         children: [
-                          const Text('GST 18%', style: TextStyle(fontSize: 13)),
-                          Text('₹ ${gst.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                  fontSize: 11, fontWeight: FontWeight.bold))
+                          const Text('Added: ',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 13)),
+                          Text(couponCode ?? "",
+                              style: const TextStyle(fontSize: 11))
                         ],
-                      )
-                    : const SizedBox.shrink(),
-                const Divider(),
-                const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Total', style: TextStyle(fontSize: 13)),
-                    Text(
-                        '₹ ${(widget.orderValue + gst + finalDelCharge).toStringAsFixed(2)}',
-                        style: const TextStyle(
-                            fontSize: 11, fontWeight: FontWeight.bold))
+                      ),
+                    // Row(
+                    //   children: [
+                    //     Text('More: ',
+                    //         style: TextStyle(
+                    //             fontWeight: FontWeight.bold,
+                    //             fontSize: 13.sp)),
+                    //     Text('HDFC30, NEW50, FIRST70',
+                    //         style: TextStyle(fontSize: 11.sp))
+                    //   ],
+                    // )
                   ],
-                ),
-                const SizedBox(height: 20),
-                Obx(
-                  () => skipVideoController.loadingThird.value
-                      ? const Center(child: CircularProgressIndicator())
-                      : CLoginButton(
-                          title: 'Book',
-                          onTap: () {
-                            print((widget.orderValue + gst + finalDelCharge)
-                                    .toString() +
-                                'amount');
-
-                            double totalAmount =
-                                widget.orderValue + gst + finalDelCharge;
-                            int totalMainAmount = (totalAmount * 100).toInt();
-                            log(
-                              totalMainAmount.toString(),
-                            );
-                            Map<String, dynamic> paymentData = {
-                              'amount':
-                                  totalMainAmount, // amount in paise (e.g., 1000 paise = Rs. 10)
-                              'currency': 'INR',
-                              'receipt': 'order_receipt',
-                              'payment_capture': '1',
-                            };
-                            initiatePayment(
-                              paymentData: paymentData,
-                              name: widget.name,
-                            );
-                            // skipVideoController.saveThirdPageAdModel(
-                            //     adDescription: widget.des,
-                            //     adOrderValue: widget.orderValue.toStringAsFixed(2),
-                            //     adChargesValue: finalDelCharge.toStringAsFixed(2),
-                            //     adCompanyLocation: widget.loc,
-                            //     adCoupan: "Test",
-                            //     adPaymendMode: "UPI",
-                            //     adPlaceApp: "Delhi",
-                            //     adRefferal: "TEST",
-                            //     adTax: gst.toStringAsFixed(2),
-                            //     adTaxNumber: widget.tax,
-                            //     adWebsite: widget.website,
-                            //     adWebsiteLink: widget.website,
-                            //     adTotal: (widget.orderValue + gst + finalDelCharge)
-                            //         .toString(),
-                            //     onSuccess: () {
-                            //       Get.to(SuccessScreen());
-                            //     });
-                          },
-                          buttonColor: AdtipColors.black,
-                          textColor: AdtipColors.white,
-                          showImage: false,
-                        ),
-                ),
-                CLoginButton(
-                  title: 'Back',
-                  onTap: () {
-                    Get.back();
-                  },
-                  buttonColor: AdtipColors.white,
-                  textColor: AdtipColors.black,
-                  showImage: false,
                 ),
               ],
             ),
-          ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("GST",
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w400,
+                    )),
+                CupertinoSwitch(
+                  value: _switchValue,
+                  onChanged: (value) {
+                    _switchValue = value;
+                    if (value) {
+                      setState(() {
+                        gst = adModelController.adValue.value * 18 / 100;
+                        _switchValue = value;
+                      });
+                    } else {
+                      setState(() {
+                        gst = 0;
+                        _switchValue = value;
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            const Text("Payment details",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                )),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Order Value', style: TextStyle(fontSize: 13)),
+                Text('₹ ${adModelController.adValue.value}',
+                    style: const TextStyle(
+                        fontSize: 11, fontWeight: FontWeight.bold))
+              ],
+            ),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                    'Delivery charge ${coupon != 0 ? ((coupon * 30) / 100) : 15}%',
+                    style: const TextStyle(fontSize: 13)),
+                Text('₹ ${finalDelCharge.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                        fontSize: 11, fontWeight: FontWeight.bold))
+              ],
+            ),
+            const SizedBox(height: 5),
+            _switchValue
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('GST 18%', style: TextStyle(fontSize: 13)),
+                      Text('₹ ${gst.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                              fontSize: 11, fontWeight: FontWeight.bold))
+                    ],
+                  )
+                : const SizedBox.shrink(),
+            const Divider(),
+            const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Total', style: TextStyle(fontSize: 13)),
+                Text(
+                    '₹ ${(adModelController.adValue.value + gst + finalDelCharge).toStringAsFixed(2)}',
+                    style: const TextStyle(
+                        fontSize: 11, fontWeight: FontWeight.bold))
+              ],
+            ),
+            const SizedBox(height: 20),
+            Obx(
+              () => skipVideoController.loadingThird.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : CLoginButton(
+                      title: 'Book',
+                      onTap: () {
+                        double totalAmount = adModelController.adValue.value +
+                            gst +
+                            finalDelCharge;
+                        int totalMainAmount = (totalAmount * 100).toInt();
+                        log(
+                          totalMainAmount.toString(),
+                        );
+                        Map<String, dynamic> paymentData = {
+                          'amount':
+                              totalMainAmount, // amount in paise (e.g., 1000 paise = Rs. 10)
+                          'currency': 'INR',
+                          'receipt': 'order_receipt',
+                          'payment_capture': '1',
+                        };
+                        initiatePayment(
+                          paymentData: paymentData,
+                          name: adModelController.compaignName.value,
+                        );
+                        // skipVideoController.saveThirdPageAdModel(
+                        //     adDescription: widget.des,
+                        //     adOrderValue: widget.orderValue.toStringAsFixed(2),
+                        //     adChargesValue: finalDelCharge.toStringAsFixed(2),
+                        //     adCompanyLocation: widget.loc,
+                        //     adCoupan: "Test",
+                        //     adPaymendMode: "UPI",
+                        //     adPlaceApp: "Delhi",
+                        //     adRefferal: "TEST",
+                        //     adTax: gst.toStringAsFixed(2),
+                        //     adTaxNumber: widget.tax,
+                        //     adWebsite: widget.website,
+                        //     adWebsiteLink: widget.website,
+                        //     adTotal: (widget.orderValue + gst + finalDelCharge)
+                        //         .toString(),
+                        //     onSuccess: () {
+                        //       Get.to(SuccessScreen());
+                        //     });
+                      },
+                      buttonColor: AdtipColors.black,
+                      textColor: AdtipColors.white,
+                      showImage: false,
+                    ),
+            ),
+            CLoginButton(
+              title: 'Back',
+              onTap: () {
+                dashboardController.changeWidget(value: 14);
+              },
+              buttonColor: AdtipColors.white,
+              textColor: AdtipColors.black,
+              showImage: false,
+            ),
+          ],
         ),
       ),
     );
@@ -487,10 +493,10 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _onSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _onCancel);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _onFailed);
-    delCharge = ((.3) * widget.orderValue);
+    delCharge = ((.15) * adModelController.adValue.value);
     couponDiscount = delCharge * (coupon / 100);
     finalDelCharge = delCharge - couponDiscount;
-    gst = _switchValue ? (.18 * (widget.orderValue)) : 0;
+    gst = _switchValue ? (.18 * (adModelController.adValue.value)) : 0;
     super.initState();
   }
 
@@ -514,21 +520,24 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
 
   void _handlePaymentSuccess() {
     skipVideoController.saveThirdPageAdModel(
-        adDescription: widget.des,
-        adOrderValue: widget.orderValue.toStringAsFixed(2),
+        adDescription: adModelController.description.value,
+        adOrderValue: adModelController.adValue.value.toStringAsFixed(2),
         adChargesValue: finalDelCharge.toStringAsFixed(2),
-        adCompanyLocation: widget.loc,
+        adCompanyLocation: adModelController.location.value,
         adCoupan: "Test",
         adPaymendMode: "UPI",
         adPlaceApp: "Delhi",
         adRefferal: "TEST",
         adTax: gst.toStringAsFixed(2),
-        adTaxNumber: widget.tax,
-        adWebsite: widget.website,
-        adWebsiteLink: widget.website,
-        adTotal: (widget.orderValue + gst + finalDelCharge).toString(),
+        adTaxNumber: adModelController.tax.value,
+        adWebsite: adModelController.website.value,
+        adWebsiteLink: adModelController.website.value,
+        adTotal:
+            (adModelController.adValue.value + gst + finalDelCharge).toString(),
         onSuccess: () {
-          Get.to(const SuccessScreen());
+          dashboardController.changeWidget(value: 16);
+
+          //Get.to(const SuccessScreen());
         });
     // Do something when payment succeeds
     // Here we get razorpay_payment_id razorpay_order_id razorpay_signature

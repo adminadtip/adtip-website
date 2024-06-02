@@ -1,3 +1,5 @@
+import 'package:adtip_web_3/modules/ad_model/controllers/ad_models_controller.dart';
+import 'package:adtip_web_3/modules/dashboard/controller/dashboard_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -10,26 +12,8 @@ import 'skip_video_controller.dart';
 import 'widget/widget.dart';
 
 class UploadVideoSecondScreen extends StatefulWidget {
-  final String? title;
-  final int oderValue;
-  final String campaign;
-  final String des;
-  final String location;
-  final String gst;
-  final String website;
-  final String? link;
-  final String name;
   const UploadVideoSecondScreen({
     super.key,
-    required this.des,
-    required this.location,
-    required this.gst,
-    required this.website,
-    this.title,
-    required this.oderValue,
-    required this.campaign,
-    this.link,
-    required this.name,
   });
 
   @override
@@ -42,13 +26,12 @@ class _UploadVideoSecondScreenState extends State<UploadVideoSecondScreen> {
   TextEditingController locationController = TextEditingController();
   final TextEditingController gstController = TextEditingController();
   final TextEditingController linkController = TextEditingController();
+  final admodelController = Get.put(AdModelsController());
+  final dashboardController = Get.put(DashboardController());
   @override
   void initState() {
     super.initState();
-    desController.text = widget.des;
-    locationController.text = widget.location;
-    gstController.text = widget.gst;
-    linkController.text = widget.link ?? widget.website;
+    linkController.text = admodelController.promoteLink.value;
   }
 
   SkipVideoController skipVideoController =
@@ -57,91 +40,91 @@ class _UploadVideoSecondScreenState extends State<UploadVideoSecondScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("${widget.link}99999");
-
-    return Scaffold(
-      backgroundColor: AdtipColors.white,
-      body: Center(
-        child: SizedBox(
-          width: 500,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.only(left: 20, right: 20),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CTextFormFiledUnderline(
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Field can't be blank";
-                        }
-                        return null;
-                      },
-                      maxLines: 3,
-                      style: customStyle(),
-                      controller: desController,
-                      title: 'Description',
-                      hintText: '\nDescribe your ad here'),
-                  CTextFormFiledUnderline(
-                    style: customStyle(),
-                    controller: locationController,
-                    title: 'Company Location',
-                    hintText: 'Enter company location',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Field can't be blank";
-                      }
-                      return null;
-                    },
-                  ),
-                  CTextFormFiledUnderline(
-                      style: customStyle(),
-                      controller: gstController,
-                      title: 'Tax number/GST number (Optional)',
-                      hintText: 'Enter tax number/GST number'),
-                  CTextFormFiledUnderline(
-                      style: customStyle(),
-                      controller: linkController,
-                      title: 'Website link',
-                      hintText: 'Enter website link (Optional)'),
-                  const SizedBox(height: 40),
-                  Obx(
-                    () => skipVideoController.loadingThird.value
-                        ? const Center(child: CircularProgressIndicator())
-                        : CLoginButton(
-                            title: 'Next',
-                            onTap: () {
-                              if (_formKey.currentState!.validate()) {
-                                Get.to(CheckOutScreen(
-                                  orderValue: widget.oderValue,
-                                  des: desController.text,
-                                  loc: locationController.text,
-                                  website: linkController.text,
-                                  campaign: widget.campaign,
-                                  tax: gstController.text,
-                                  name: widget.name,
-                                ));
-                              }
-                            },
-                            buttonColor: AdtipColors.black,
-                            textColor: AdtipColors.white,
-                            showImage: false,
-                          ),
-                  ),
-                  CLoginButton(
-                    title: 'Back',
-                    onTap: () {
-                      Get.back();
-                    },
-                    buttonColor: AdtipColors.white,
-                    textColor: AdtipColors.black,
-                    showImage: false,
-                  ),
-                  SizedBox(height: 30),
-                ],
+    return SizedBox(
+      width: 500,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(left: 20, right: 20),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                admodelController.title.value,
+                style: const TextStyle(fontSize: 20),
               ),
-            ),
+              const SizedBox(
+                height: 20,
+              ),
+              CTextFormFiledUnderline(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Field can't be blank";
+                    }
+                    return null;
+                  },
+                  maxLines: 3,
+                  style: customStyle(),
+                  controller: desController,
+                  title: 'Description',
+                  hintText: '\nDescribe your ad here'),
+              CTextFormFiledUnderline(
+                style: customStyle(),
+                controller: locationController,
+                title: 'Company Location',
+                hintText: 'Enter company location',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Field can't be blank";
+                  }
+                  return null;
+                },
+              ),
+              CTextFormFiledUnderline(
+                  style: customStyle(),
+                  controller: gstController,
+                  title: 'Tax number/GST number (Optional)',
+                  hintText: 'Enter tax number/GST number'),
+              CTextFormFiledUnderline(
+                  style: customStyle(),
+                  controller: linkController,
+                  title: 'Website link',
+                  hintText: 'Enter website link (Optional)'),
+              const SizedBox(height: 40),
+              Obx(
+                () => skipVideoController.loadingThird.value
+                    ? const Center(child: CircularProgressIndicator())
+                    : CLoginButton(
+                        title: 'Next',
+                        onTap: () {
+                          if (_formKey.currentState!.validate()) {
+                            dashboardController.changeWidget(value: 15);
+                            admodelController.description.value =
+                                desController.text;
+                            admodelController.location.value =
+                                locationController.text;
+                            admodelController.website.value =
+                                linkController.text;
+                            admodelController.tax.value = gstController.text;
+                            dashboardController.changeWidget(value: 15);
+                          }
+                        },
+                        buttonColor: AdtipColors.black,
+                        textColor: AdtipColors.white,
+                        showImage: false,
+                      ),
+              ),
+              CLoginButton(
+                title: 'Back',
+                onTap: () {
+                  dashboardController.changeWidget(value: 13);
+                },
+                buttonColor: AdtipColors.white,
+                textColor: AdtipColors.black,
+                showImage: false,
+              ),
+              const SizedBox(height: 30),
+            ],
           ),
         ),
       ),

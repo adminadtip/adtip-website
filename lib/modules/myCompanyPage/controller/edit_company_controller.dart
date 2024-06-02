@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:adtip_web_3/helpers/utils/utils.dart';
+import 'package:adtip_web_3/modules/dashboard/controller/dashboard_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -19,6 +20,7 @@ import '../page/my_company_page.dart';
 
 class EditCompanyController extends GetxController {
   final _userCompanyProfile = CreateCompanyModelRequestData().obs;
+  final dashboardController = Get.put(DashboardController());
   CreateCompanyModelRequestData get userCompanyProfile =>
       _userCompanyProfile.value;
 
@@ -40,113 +42,61 @@ class EditCompanyController extends GetxController {
   final _apiServices = NetworkApiServices();
 
   Future<bool> pickBannerImage() async {
+    // try {
+    //
+    //   // final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    //   // if (image == null) return false;
+    //   // final File pathvlaue = File(image.path);
+    //   // int sizeInBytes = pathvlaue.lengthSync();
+    //   // double sizeInMb = sizeInBytes / (1024 * 1024);
+    //   // sizeInMb = double.parse(sizeInMb.toStringAsFixed(4));
+    //   //
+    //   // if (sizeInMb <= 1) {
+    //   //   _imageBanner.value = File(image.path);
+    //   //   coverImage.value = image.path;
+    //   //   update();
+    //   //   return true;
+    //   // } else {
+    //   //   Utils.showErrorMessage('Please upload image less than 1mb');
+    //   // }
+    // } catch (e) {}
+    // return false;
     try {
       final image = await ImagePicker().pickImage(source: ImageSource.gallery);
       if (image == null) return false;
-      final File pathvlaue = File(image.path);
-      int sizeInBytes = pathvlaue.lengthSync();
-      double sizeInMb = sizeInBytes / (1024 * 1024);
-      sizeInMb = double.parse(sizeInMb.toStringAsFixed(4));
-
-      if (sizeInMb <= 1) {
-        _imageBanner.value = File(image.path);
-        coverImage.value = image.path;
-        update();
-        return true;
-      } else {
-        Utils.showErrorMessage('Please upload image less than 1mb');
-      }
-    } catch (e) {}
+      coverImage.value = image.path;
+      print('cover image ${coverImage.value}');
+    } catch (e) {
+      print('error $e');
+    }
     return false;
   }
 
   Future<bool> pickCompanyProfileImage() async {
+    // try {
+    //   final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    //   if (image == null) return false;
+    //   final File pathvlaue = File(image.path);
+    //   int sizeInBytes = pathvlaue.lengthSync();
+    //   double sizeInMb = sizeInBytes / (1024 * 1024);
+    //   sizeInMb = double.parse(sizeInMb.toStringAsFixed(4));
+    //
+    //   if (sizeInMb <= 1) {
+    //     _imageCompanyProfile.value = File(image.path);
+    //     profileImage.value = image.path;
+    //     update();
+    //     return true;
+    //   } else {
+    //     Utils.showErrorMessage('Please upload image less than 1mb');
+    //   }
+    // } catch (e) {}
+    // return false;
     try {
       final image = await ImagePicker().pickImage(source: ImageSource.gallery);
       if (image == null) return false;
-      final File pathvlaue = File(image.path);
-      int sizeInBytes = pathvlaue.lengthSync();
-      double sizeInMb = sizeInBytes / (1024 * 1024);
-      sizeInMb = double.parse(sizeInMb.toStringAsFixed(4));
-
-      if (sizeInMb <= 1) {
-        _imageCompanyProfile.value = File(image.path);
-        profileImage.value = image.path;
-        update();
-        return true;
-      } else {
-        Utils.showErrorMessage('Please upload image less than 1mb');
-      }
+      profileImage.value = image.path;
     } catch (e) {}
     return false;
-  }
-
-  void showMessage(String message, {bool? isError}) {
-    final snackBar = SnackBar(
-        backgroundColor:
-            isError == true ? AdtipColors.red : Color.fromARGB(255, 0, 52, 94),
-        content: Text(
-          message,
-          style: TextStyle(
-              color: AdtipColors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 15),
-        ));
-    ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
-  }
-
-  Future<void> updateCompanyPag({String? companyId}) async {
-    try {
-      _isLoading.value = true;
-      const url = "${UrlConstants.BASE_URL}updatecompany";
-      final uri = Uri.parse(url);
-      var request = http.MultipartRequest('POST', uri);
-      print(
-          "beartoken ${LocalPrefs().getStringPref(key: SharedPreferenceKey.UserLoggedIn)}");
-      request.headers.addAll({
-        'Content-Type': 'application/json',
-        "authorization":
-            "Bearer ${LocalPrefs().getStringPref(key: SharedPreferenceKey.UserLoggedIn)}"
-      });
-      imageBanner!.value.path.isNotEmpty
-          ? request.files.add(await http.MultipartFile.fromPath(
-              'coverImage', imageBanner!.value.path))
-          : null;
-
-      imageCompanyProfile!.value.path.isNotEmpty
-          ? request.files.add(await http.MultipartFile.fromPath(
-              "profileImage", imageCompanyProfile!.value.path))
-          : null;
-
-      request.fields["name"] = _userCompanyProfile.value.companyName ?? "";
-      request.fields['email'] = _userCompanyProfile.value.companyEmail ?? '';
-      request.fields["website"] = _userCompanyProfile.value.websiteUrl ?? "";
-      request.fields["location"] = _userCompanyProfile.value.location ?? "";
-      request.fields["phone"] = _userCompanyProfile.value.phoneNumber ?? "";
-      request.fields["industry"] = _userCompanyProfile.value.companyType ?? "";
-      request.fields["about"] = _userCompanyProfile.value.description ?? "";
-      request.fields["button"] = _userCompanyProfile.value.buttonType ?? '';
-      request.fields["id"] = companyId ?? "";
-
-      var streamedResponse = await request.send();
-
-      var response = await http.Response.fromStream(streamedResponse);
-      var respBody = json.decode(response.body);
-      if (response.statusCode == 200) {
-        showMessage(jsonDecode(response.body)["message"]);
-        Get.offAll(DashboardPage());
-        Get.to(() => MyCompanyPage(
-              companyID: companyId!,
-            ));
-      } else if (respBody['status'] == 500) {
-        showMessage(respBody["message"], isError: true);
-        _isLoading.value = false;
-      } else {
-        showMessage(respBody["message"], isError: true);
-        _isLoading.value = false;
-      }
-      _isLoading.value = false;
-    } catch (e) {}
   }
 
   Future<void> updateCompany({required int companyId}) async {
@@ -156,11 +106,11 @@ class EditCompanyController extends GetxController {
       _isLoading.value = true;
       if (profileImage.isNotEmpty) {
         profileUrl = await Utils.uploadImageToAwsAmplify(
-            path: coverImage.value, folderName: 'companyProfileImage');
+            path: profileImage.value, folderName: 'companyProfileImage');
       }
       if (coverImage.isNotEmpty) {
         coverUrl = await Utils.uploadImageToAwsAmplify(
-            path: coverImage.value, folderName: 'companyProfileImage');
+            path: coverImage.value, folderName: 'companyCoverImage');
       }
       var body = {
         "name": _userCompanyProfile.value.companyName,
@@ -181,7 +131,7 @@ class EditCompanyController extends GetxController {
       );
       _isLoading.value = false;
       Utils.showSuccessMessage("company updated successfully");
-      Get.offAll(DashboardPage());
+      dashboardController.changeWidget(value: 0);
     } catch (e) {
       _isLoading.value = false;
       Utils.showErrorMessage('Error updating company');

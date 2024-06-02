@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:adtip_web_3/helpers/utils/utils.dart';
+import 'package:adtip_web_3/modules/dashboard/controller/dashboard_controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../helpers/constants/url_constants.dart';
@@ -13,6 +15,7 @@ import '../models/last_data_fill.dart';
 
 class SkipVideoController extends GetxController {
   final List<dynamic> companyListData = [];
+  final dashboardController = Get.put(DashboardController());
   final List<ProfessionListData> areaListData = [];
   final List<LastFillData> lastFillData = [];
 
@@ -87,7 +90,9 @@ class SkipVideoController extends GetxController {
         loadingVideo.value = true;
 
         String? fileString = image?.path.split('/').last;
-        print(fileString);
+        if (kDebugMode) {
+          print(fileString);
+        }
         videoPath.value = fileString ?? "";
         videoUrl.value = await Utils.uploadVideoToAwsAmplify(
             path: image!.path, folderName: 'Ads Video');
@@ -106,7 +111,9 @@ class SkipVideoController extends GetxController {
       loadingVideo.value = false;
     } catch (e) {
       loadingVideo.value = false;
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -193,13 +200,13 @@ class SkipVideoController extends GetxController {
       print("${response['data'][0]['id']}uuuuuu");
       id.value = response['data'][0]['id'].toString();
       await onSuccess();
+      dashboardController.changeWidget(value: 13);
       loadingFirst.value = false;
-      print(id.value);
       loadingFirst.value = false;
-    } on Exception catch (e) {
+    } catch (e) {
       loadingFirst.value = false;
-
-      print(e);
+    } finally {
+      loadingFirst.value = false;
     }
   }
 
@@ -302,5 +309,9 @@ class SkipVideoController extends GetxController {
 
       print(e);
     }
+  }
+
+  changeWidget() {
+    dashboardController.changeWidget(value: 0);
   }
 }

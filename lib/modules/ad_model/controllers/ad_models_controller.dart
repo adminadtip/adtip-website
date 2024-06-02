@@ -12,21 +12,41 @@ class AdModelsController extends GetxController {
   final loadingDemo = false.obs;
 
   List<AdModelData> adModelData = [];
+
+  ///for skip video screen
+  Rx<int> viewPrice = 0.obs;
+  Rx<String> title = ''.obs;
+  Rx<String> modelId = ''.obs;
+  Rx<String> mediaType = ''.obs;
+  Rx<String> link = ''.obs;
+  Rx<int> adValue = 0.obs;
+  Rx<String> compaignName = ''.obs;
+  Rx<String> description = ''.obs;
+  Rx<String> location = ''.obs;
+  Rx<String> website = ''.obs;
+  Rx<String> tax = ''.obs;
+  Rx<String> promoteLink = ''.obs;
+
   final _apiServices = NetworkApiServices();
   Future getAdModelsList() async {
     adModelData.clear();
+    update();
     if (adModelData.isEmpty) {
       try {
         adModelData.clear();
         loading.value = true;
+        update();
         final response =
             await _apiServices.getApi(UrlConstants.getAdModelsListURL);
 
         AdModel adModel = AdModel.fromJson(response);
         adModelData.addAll(adModel.data ?? []);
         loading.value = false;
-      } on Exception catch (e) {
+        update();
+        print('ad models length ${adModelData.length}');
+      } catch (e) {
         loading.value = false;
+        update();
 
         print(e);
       }
@@ -65,5 +85,18 @@ class AdModelsController extends GetxController {
 
       print(e);
     }
+  }
+
+  setForSkipVideo(
+      {required String title1,
+      required int viewPrice1,
+      required String modelId1,
+      required String mediaType1,
+      required String link1}) {
+    viewPrice.value = viewPrice1;
+    title.value = title1;
+    modelId.value = modelId1;
+    mediaType.value = mediaType1;
+    link.value = link1;
   }
 }

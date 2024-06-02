@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:adtip_web_3/helpers/utils/utils.dart';
+import 'package:adtip_web_3/modules/dashboard/controller/dashboard_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,37 +18,34 @@ import '../../../helpers/local_database/sharedpref_key.dart';
 import '../../../netwrok/network_api_services.dart';
 import '../../../widgets/icon/c_icon_image.dart';
 import '../../../widgets/text/loader.dart';
+import '../../createCompany/controller/create_company_controller.dart';
 import '../controller/my_company_controller.dart';
+import '../view_product_details/view_product_detail_controller.dart';
 
 class AddProductScreen extends StatefulWidget {
-  final companyID;
-  final data;
-  final title;
-  bool? isedit;
-  final productid;
-
-  AddProductScreen(
-      {super.key,
-      this.companyID,
-      this.data,
-      this.title,
-      required this.isedit,
-      this.productid});
+  AddProductScreen({super.key});
 
   @override
   State<AddProductScreen> createState() => _AddProductScreenState();
 }
 
 class _AddProductScreenState extends State<AddProductScreen> {
-  TextEditingController _nameFieldController = TextEditingController();
-  TextEditingController _descriptionFieldController = TextEditingController();
-  TextEditingController _brandNameFieldController = TextEditingController();
-  TextEditingController _unitFieldController = TextEditingController();
-  TextEditingController _regularPriceFieldController = TextEditingController();
-  TextEditingController _marketPriceFieldController = TextEditingController();
+  final TextEditingController _nameFieldController = TextEditingController();
+  final TextEditingController _descriptionFieldController =
+      TextEditingController();
+  final TextEditingController _brandNameFieldController =
+      TextEditingController();
+  final TextEditingController _unitFieldController = TextEditingController();
+  final TextEditingController _regularPriceFieldController =
+      TextEditingController();
+  final TextEditingController _marketPriceFieldController =
+      TextEditingController();
   String? selectedDays = '7-8';
   int? selectedDeliveryType = 0;
   final controller = Get.put(MyCompanyController());
+  final companyController = Get.put(CreateCompanyController());
+  final dashboardController = Get.put(DashboardController());
+  final viewProductController = Get.put(ProductDetailsController());
 
   List imageList = [];
   List categories = [];
@@ -54,6 +54,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   late final response;
   // Initialize a set to store selected sizes
   List<dynamic> selectedSizes = [];
+  bool isLoading = false;
 
   // List of available sizes
   List<String> sizes = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -114,8 +115,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
   void initState() {
     super.initState();
     fetchCategories();
-    if (widget.data != null) {
-      Map<String, dynamic> dataMap = widget.data[0];
+    if (viewProductController.isEdit.value) {
+      Map<String, dynamic> dataMap =
+          viewProductController.productListData[0].toJson();
       _nameFieldController.text = dataMap['name'];
       _descriptionFieldController.text = dataMap['description'];
       _brandNameFieldController.text = dataMap['brand'];
@@ -125,7 +127,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
       _marketPriceFieldController.text = dataMap["market_price"].toString();
       selectedSizes.addAll(dataMap["size"]);
       imageList.addAll(dataMap["images"]);
-      print("=== $categories");
+      if (kDebugMode) {
+        print("=== $categories");
+      }
     }
   }
 
@@ -135,11 +139,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
     setState(() {
       categories = response["data"];
-      print("categ === $categories");
-      if (widget.data != null) {
-        Map<String, dynamic> dataMap = widget.data[0];
-        List categoryName =
-            getCategoryNameById(dataMap["category_id"], categories);
+      if (kDebugMode) {
+        print("categ === $categories");
       }
     });
   }
@@ -148,9 +149,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
     for (var category in categories) {
       if (category['id'] == categoryId) {
         setState(() {
-          print("=== $category");
+          if (kDebugMode) {
+            print("=== $category");
+          }
           selectedCategory = category;
-          print("cat== $selectedCategory");
+          if (kDebugMode) {
+            print("cat== $selectedCategory");
+          }
         });
       }
     }
@@ -168,12 +173,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
       'marketPrice': _marketPriceFieldController.text,
       "size": selectedSizes,
       "images": imageList,
-      "companyId": widget.companyID,
+      "companyId": companyController.selectedCompanyId.value.toString(),
       "created_by": userId
     };
     await NetworkApiServices().postApi(data, UrlConstants.addproduct);
-    print("resp=== ${response["status"]}");
-    print(response["message"]);
+    if (kDebugMode) {
+      print("resp=== ${response["status"]}");
+      print(response["message"]);
+    }
   }
 
   editProduct() async {
@@ -188,16 +195,18 @@ class _AddProductScreenState extends State<AddProductScreen> {
       'marketPrice': _marketPriceFieldController.text,
       "size": selectedSizes,
       "images": imageList,
-      "companyId": widget.companyID,
-      'id': widget.productid,
+      "companyId": companyController.selectedCompanyId.value.toString(),
+      'id': viewProductController.selectedProductId.value,
     };
-    print(widget.isedit);
 
     response =
         await NetworkApiServices().postApi(data, UrlConstants.editproduct);
-    print(response);
-    print("resp=== ${response["status"]}");
-    print(response["message"]);
+
+    if (kDebugMode) {
+      print(response);
+      print("resp=== ${response["status"]}");
+      print(response["message"]);
+    }
   }
 
   Widget _buildImageList() {
@@ -224,7 +233,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           height: 100,
                           fit: BoxFit.cover,
                           placeholder: (context, url) =>
-                              Center(child: CircularProgressIndicator()),
+                              const Center(child: CircularProgressIndicator()),
                           errorWidget: (context, url, error) => Image.asset(
                             'assets/images/noImage.jpg',
                           ),
@@ -378,14 +387,27 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: SizedBox(
-          width: 500,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 32, right: 32),
+    return Center(
+      child: SizedBox(
+        width: 500,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 32, right: 32),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
             child: ListView(
               children: [
+                Text(
+                  !viewProductController.isEdit.value
+                      ? 'Add Product'
+                      : 'Edit Product',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
                 const Text(
                   'Name',
                   style: TextStyle(
@@ -517,7 +539,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       });
                     },
                     validator: (value) {
-                      print(value);
+                      if (kDebugMode) {
+                        print(value);
+                      }
                       if (value == null) {
                         return "Field can't be blank";
                       }
@@ -588,6 +612,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 TextField(
                     controller: _unitFieldController,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: InputDecoration(
                         hintText: "Enter stock units count",
                         hintStyle: const TextStyle(
@@ -663,6 +688,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 TextField(
                     controller: _regularPriceFieldController,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: InputDecoration(
                         hintText: "₹",
                         hintStyle: const TextStyle(
@@ -698,6 +724,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 TextField(
                     controller: _marketPriceFieldController,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: InputDecoration(
                         hintText: "₹",
                         hintStyle: const TextStyle(
@@ -745,60 +772,88 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Container(
-                  height: 60,
-                  width: 335,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.black,
-                  ),
-                  child: TextButton(
-                    onPressed: () async {
-                      print(selectedCategory);
-                      if (_nameFieldController.text.isEmpty) {
-                        Utils.showErrorMessage('Please enter name of product');
-                      } else if (_descriptionFieldController.text.isEmpty) {
-                        Utils.showErrorMessage('Please enter name of product');
-                      } else if (selectedCategory == null) {
-                        Utils.showErrorMessage('Please select category');
-                      } else if (_unitFieldController.text.isEmpty) {
-                        Utils.showErrorMessage('Please enter units');
-                      } else if (_regularPriceFieldController.text.isEmpty ||
-                          _marketPriceFieldController.text.isEmpty) {
-                        Utils.showErrorMessage(
-                            'please enter regular and market price');
-                      } else if (int.parse(_regularPriceFieldController.text) <
-                          int.parse(_marketPriceFieldController.text)) {
-                        Utils.showErrorMessage(
-                            'Regular price must be greater than market price');
-                      } else if (imageList.length == 0) {
-                        Utils.showErrorMessage('Please upload image');
-                      } else {
-                        if (widget.isedit == false) {
-                          await addProduct();
-                          await controller
-                              .fetchCompanyProductList(widget.companyID!);
-                          Navigator.of(context).pop();
-                          Utils.showErrorMessage('Product added successfully.');
-                        } else {
-                          editProduct();
-                          Navigator.of(context).pop();
-                          Utils.showErrorMessage(
-                              'Product updated successfully.');
-                        }
-                      }
-                    },
-                    child: Text(
-                      widget.isedit == false ? 'Add Product' : "Save",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
+                isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : Container(
+                        height: 60,
+                        width: 335,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.black,
+                        ),
+                        child: TextButton(
+                          onPressed: () async {
+                            if (kDebugMode) {
+                              print(selectedCategory);
+                            }
+                            if (_nameFieldController.text.isEmpty) {
+                              Utils.showErrorMessage(
+                                  'Please enter name of product');
+                            } else if (_descriptionFieldController
+                                .text.isEmpty) {
+                              Utils.showErrorMessage(
+                                  'Please enter name of product');
+                            } else if (selectedCategory == null) {
+                              Utils.showErrorMessage('Please select category');
+                            } else if (_unitFieldController.text.isEmpty) {
+                              Utils.showErrorMessage('Please enter units');
+                            } else if (_regularPriceFieldController
+                                    .text.isEmpty ||
+                                _marketPriceFieldController.text.isEmpty) {
+                              Utils.showErrorMessage(
+                                  'please enter regular and market price');
+                            } else if (int.parse(
+                                    _regularPriceFieldController.text) <
+                                int.parse(_marketPriceFieldController.text)) {
+                              Utils.showErrorMessage(
+                                  'Regular price must be greater than market price');
+                            } else if (imageList.isEmpty) {
+                              Utils.showErrorMessage('Please upload image');
+                            } else {
+                              if (viewProductController.isEdit.value == false) {
+                                setState(() {
+                                  isLoading = true;
+                                });
+                                await addProduct();
+                                setState(() {
+                                  isLoading = false;
+                                });
+                                // await controller.fetchCompanyProductList(
+                                //     companyController.selectedCompanyId.value
+                                //         .toString());
+                                dashboardController.changeWidget(value: 0);
+                                Utils.showSuccessMessage(
+                                    'Product added successfully.');
+                              } else {
+                                setState(() {
+                                  isLoading = true;
+                                });
+
+                                editProduct();
+                                setState(() {
+                                  isLoading = false;
+                                });
+                                dashboardController.changeWidget(value: 0);
+                                Utils.showSuccessMessage(
+                                    'Product updated successfully.');
+                              }
+                            }
+                          },
+                          child: Text(
+                            viewProductController.isEdit.value == false
+                                ? 'Add Product'
+                                : "Save",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 16),
-                widget.isedit == false
+                viewProductController.isEdit.value == false
                     ? Container(
                         height: 60,
                         width: 315,
@@ -811,7 +866,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         ),
                         child: TextButton(
                           onPressed: () {
-                            Get.back();
+                            dashboardController.changeWidget(value: 2);
                           },
                           child: const Text(
                             'No Thanks',

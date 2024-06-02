@@ -17,6 +17,8 @@ class OrdersController extends GetxController {
   int? userId = LocalPrefs().getIntegerPref(key: SharedPreferenceKey.UserId);
   final loading = false.obs;
   final _apiServices = NetworkApiServices();
+  Rx<int> selectedOrder = 0.obs;
+  Rx<int> selectedOrderId = 0.obs;
   Future getOrderList() async {
     if (orderListData.isEmpty) {
       try {
@@ -37,12 +39,11 @@ class OrdersController extends GetxController {
                 .toList() ??
             []);
         loading.value = false;
-      } on Exception catch (e) {
+      } catch (e) {
         loading.value = false;
-
-        print(e);
+      } finally {
+        loading.value = false;
       }
-      loading.value = false;
     }
   }
 
@@ -68,6 +69,11 @@ class OrdersController extends GetxController {
 
   void setSelect(OrderListData companyList) {
     selectData.value = companyList;
+  }
+
+  void changeOrderIndex({required int index, required int orderId}) {
+    selectedOrder.value = index;
+    selectedOrderId.value = orderId;
   }
 
   bool checkIsSelected(OrderListData professionListData) {

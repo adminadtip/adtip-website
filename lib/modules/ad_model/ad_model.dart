@@ -1,4 +1,5 @@
 import 'package:adtip_web_3/modules/ad_model/skip_video/skip_video.dart';
+import 'package:adtip_web_3/modules/dashboard/controller/dashboard_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -24,68 +25,61 @@ class AdModelScreen extends StatefulWidget {
 class _AdModelScreenState extends State<AdModelScreen> {
   final AdModelsController adModelsController =
       Get.put(AdModelsController(), permanent: true);
+  final dashboardController = Get.put(DashboardController());
   @override
   void initState() {
     super.initState();
-    adModelsController.getAdModelsList();
+    if (adModelsController.adModelData.isEmpty) {
+      adModelsController.getAdModelsList();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: SizedBox(
-          width: 500,
-          child: SingleChildScrollView(
-            child: Obx(
-              () {
-                if (adModelsController.loading.value) {
-                  return const Loader();
-                }
-                return Column(
-                  children: [
-                    ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: adModelsController.adModelData.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, i) {
-                          return customContainer(
-                              discount: adModelsController
-                                  .adModelData[i].discount
-                                  .toString(),
-                              basePrice: adModelsController
-                                  .adModelData[i].basePrice
-                                  .toString(),
-                              viewPrice: adModelsController
-                                  .adModelData[i].viewPrice
-                                  .toString(),
-                              url:
-                                  "${adModelsController.adModelData[i].modelImage}",
-                              title:
-                                  adModelsController.adModelData[i].name ?? "",
-                              onTap: () {
-                                Get.to(
-                                  SkipVideoScreen(
-                                    viewPrice: adModelsController
-                                        .adModelData[i].viewPrice,
-                                    link: widget.link,
-                                    mediaType: adModelsController
-                                        .adModelData[i].mediaType,
-                                    modelId: adModelsController
-                                        .adModelData[i].id
-                                        .toString(),
-                                    title: adModelsController
-                                            .adModelData[i].name ??
+    return SizedBox(
+      width: 500,
+      child: SingleChildScrollView(
+        child: Obx(
+          () {
+            if (adModelsController.loading.value) {
+              return const Loader();
+            }
+            return Column(
+              children: [
+                ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: adModelsController.adModelData.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, i) {
+                      return customContainer(
+                          discount: adModelsController.adModelData[i].discount
+                              .toString(),
+                          basePrice: adModelsController.adModelData[i].basePrice
+                              .toString(),
+                          viewPrice: adModelsController.adModelData[i].viewPrice
+                              .toString(),
+                          url:
+                              "${adModelsController.adModelData[i].modelImage}",
+                          title: adModelsController.adModelData[i].name ?? "",
+                          onTap: () {
+                            adModelsController.setForSkipVideo(
+                                title1:
+                                    adModelsController.adModelData[i].name ??
                                         "",
-                                  ),
-                                );
-                              });
-                        }),
-                  ],
-                );
-              },
-            ),
-          ),
+                                viewPrice1:
+                                    adModelsController.adModelData[i].viewPrice,
+                                modelId1: adModelsController.adModelData[i].id
+                                    .toString(),
+                                mediaType1: adModelsController
+                                        .adModelData[i].mediaType ??
+                                    '',
+                                link1: widget.link ?? '');
+                            dashboardController.changeWidget(value: 12);
+                          });
+                    }),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -120,7 +114,7 @@ class _AdModelScreenState extends State<AdModelScreen> {
                     ],
                   ),
                   subtitle: Text(
-                      "Short $title between WeTube video have high click thourgh rate.",
+                      "Short $title between WeTube video have high click through rate.",
                       style: GoogleFonts.roboto(
                           fontSize: 12, fontWeight: FontWeight.w400)),
                 ),

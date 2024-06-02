@@ -1,9 +1,16 @@
 import 'package:adtip_web_3/modules/authentication/controllers/landing_controller.dart';
 import 'package:adtip_web_3/modules/authentication/pages/login_screen.dart';
+import 'package:adtip_web_3/modules/calling/pages/callPage.dart';
+import 'package:adtip_web_3/modules/dashboard/pages/terms_service_page.dart';
+import 'package:adtip_web_3/modules/qr_ad_display/controller/qr_ad_controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../helpers/utils/utils.dart';
+import '../../dashboard/pages/privacy_page.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -14,6 +21,7 @@ class LandingPage extends StatefulWidget {
 
 class _LandingPageState extends State<LandingPage> {
   LandingController landingController = Get.put(LandingController());
+  final qrController = Get.put(QrCodeAdDisplayController());
   List<String> categories = [
     'Ad Posting',
     'Sales',
@@ -21,15 +29,35 @@ class _LandingPageState extends State<LandingPage> {
     'Enquiry',
     'Other'
   ];
+  int selectedIndex = 0;
+  List<Map<String, dynamic>> data = [
+    {
+      'title': 'Create AdTip account & start your Ad Campaign',
+      'subtitle':
+          'Click on the get started button below. You will be prompted to verify your phone number through OTP. Once signed in, navigate to the "Create Company Page" section and fill in the required details. Congrats, Your company page is now available for posting ads.'
+    },
+    {
+      'title': 'Add your company’s products on your Advertiser Page',
+      'subtitle':
+          'Once your account is set up, add your products or services to Adtip. Our platform supports a variety of ad models, allowing you to promote your offerings effectively and reach a targeted audience.'
+    },
+    {
+      'title': 'Increase sales and improve your business in AdTip',
+      'subtitle':
+          'Watch your sales soar as you connect directly with viewers who engage with and like your ads. With Adtip, you can contact interested customers directly through the platform and sell anything with ease.'
+    },
+  ];
   int _selectedIndex = 0;
   final formKey = GlobalKey<FormState>();
   final name = TextEditingController();
   final phoneNumber = TextEditingController();
   final message = TextEditingController();
+  final homeKey = GlobalKey();
   final featureKey = GlobalKey();
   final adModelKey = GlobalKey();
   final servicesKey = GlobalKey();
   final contactKey = GlobalKey();
+  final faqKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +65,11 @@ class _LandingPageState extends State<LandingPage> {
       child: Scaffold(
         body: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// menus //home
               Container(
+                key: homeKey,
                 decoration: const BoxDecoration(
                   color: Color(0xFFF5F7FA),
                 ),
@@ -60,7 +90,7 @@ class _LandingPageState extends State<LandingPage> {
                             const SizedBox(
                               width: 10,
                             ),
-                            Image.asset('images/adtip_icon.png'),
+                            Image.asset('assets/images/adtip_icon.png'),
                           ],
                         ),
                         Row(
@@ -68,9 +98,9 @@ class _LandingPageState extends State<LandingPage> {
                             Text(
                               'Home',
                               style: GoogleFonts.inter(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xFF01C8CF)),
                             ),
                             const SizedBox(
                               width: 20,
@@ -129,16 +159,6 @@ class _LandingPageState extends State<LandingPage> {
                             const SizedBox(
                               width: 20,
                             ),
-                            Text(
-                              'FAQ',
-                              style: GoogleFonts.inter(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 20,
-                            ),
                             InkWell(
                               onTap: () {
                                 Scrollable.ensureVisible(
@@ -149,9 +169,27 @@ class _LandingPageState extends State<LandingPage> {
                               child: Text(
                                 'Get Demo',
                                 style: GoogleFonts.inter(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: const Color(0xFF01C8CF)),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  //color: const Color(0xFF01C8CF)
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Scrollable.ensureVisible(faqKey.currentContext!,
+                                    duration:
+                                        const Duration(milliseconds: 300));
+                              },
+                              child: Text(
+                                'FAQ',
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ],
@@ -160,7 +198,15 @@ class _LandingPageState extends State<LandingPage> {
                           children: [
                             InkWell(
                               onTap: () {
-                                Get.to(LoginScreen());
+                                Get.to(const LoginScreen())?.then((value) => {
+                                      if (value != null)
+                                        {
+                                          Scrollable.ensureVisible(
+                                              contactKey.currentContext!,
+                                              duration: const Duration(
+                                                  milliseconds: 300))
+                                        }
+                                    });
                               },
                               child: Text(
                                 'Login',
@@ -175,7 +221,15 @@ class _LandingPageState extends State<LandingPage> {
                             ),
                             ElevatedButton(
                               onPressed: () {
-                                Get.to(const LoginScreen());
+                                Get.to(const LoginScreen())?.then((value) => {
+                                      if (value != null)
+                                        {
+                                          Scrollable.ensureVisible(
+                                              contactKey.currentContext!,
+                                              duration: const Duration(
+                                                  milliseconds: 300))
+                                        }
+                                    });
                               },
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF01C8CF),
@@ -213,7 +267,7 @@ class _LandingPageState extends State<LandingPage> {
                               ),
                             ),
                             Text(
-                              "your advertisement's\nmoney delivered to\nviewer wallet",
+                              "Reaching right people\nevery time",
                               style: GoogleFonts.inter(
                                   fontSize: 64,
                                   fontWeight: FontWeight.w700,
@@ -223,7 +277,7 @@ class _LandingPageState extends State<LandingPage> {
                               height: 10,
                             ),
                             Text(
-                              'Your ads viewer to get money to watch your ads.',
+                              'Get your viewers to earn money by watching your ads',
                               style: GoogleFonts.inter(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
@@ -235,7 +289,15 @@ class _LandingPageState extends State<LandingPage> {
                             ),
                             ElevatedButton(
                               onPressed: () {
-                                Get.to(const LoginScreen());
+                                Get.to(const LoginScreen())?.then((value) => {
+                                      if (value != null)
+                                        {
+                                          Scrollable.ensureVisible(
+                                              contactKey.currentContext!,
+                                              duration: const Duration(
+                                                  milliseconds: 300))
+                                        }
+                                    });
                               },
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF01C8CF),
@@ -286,30 +348,30 @@ class _LandingPageState extends State<LandingPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Container(
-                    width: 165,
-                    height: 75,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        color: const Color(0xFF373257)),
-                    child: Center(
-                      child: Text(
-                        'Features',
-                        style: GoogleFonts.nunito(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xFF1AD4D9),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  // Container(
+                  //   width: 165,
+                  //   height: 75,
+                  //   decoration: BoxDecoration(
+                  //       borderRadius: BorderRadius.circular(30),
+                  //       color: const Color(0xFF373257)),
+                  //   child: Center(
+                  //     child: Text(
+                  //       'Features',
+                  //       style: GoogleFonts.inter(
+                  //         fontSize: 18,
+                  //         fontWeight: FontWeight.w500,
+                  //         color: const Color(0xFF1AD4D9),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // const SizedBox(
+                  //   height: 10,
+                  // ),
                   Text(
                     'Innovative features to boost\nyour marketing',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.nunito(
+                    style: GoogleFonts.inter(
                       fontSize: 50,
                       fontWeight: FontWeight.w900,
                     ),
@@ -330,8 +392,8 @@ class _LandingPageState extends State<LandingPage> {
                               height: 10,
                             ),
                             Text(
-                              'Consumers earn money!',
-                              style: GoogleFonts.nunito(
+                              'Viewers earn money',
+                              style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 30,
                               ),
@@ -340,23 +402,23 @@ class _LandingPageState extends State<LandingPage> {
                               height: 10,
                             ),
                             Text(
-                              'Contrary to popular belief, Lore Ipsum is not simply random text. It has roots in a piece.',
+                              'viewers on the Adtip app earn money by watching and sharing ads.',
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.nunito(
+                              style: GoogleFonts.inter(
                                 fontSize: 22,
                               ),
                             ),
                             const SizedBox(
                               height: 20,
                             ),
-                            Text(
-                              'Learn More',
-                              style: GoogleFonts.nunito(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
+                            // Text(
+                            //   'Learn More',
+                            //   style: GoogleFonts.inter(
+                            //     fontSize: 18,
+                            //     fontWeight: FontWeight.bold,
+                            //     decoration: TextDecoration.underline,
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
@@ -375,7 +437,7 @@ class _LandingPageState extends State<LandingPage> {
                             ),
                             Text(
                               'Interact with you customers!',
-                              style: GoogleFonts.nunito(
+                              style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 30,
                               ),
@@ -384,23 +446,23 @@ class _LandingPageState extends State<LandingPage> {
                               height: 10,
                             ),
                             Text(
-                              'Contrary to popular belief, Lore Ipsum is not simply random text. It has roots in a piece.',
+                              'Direct interaction with viewers via the Invoice app call feature fosters real-time engagement.',
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.nunito(
+                              style: GoogleFonts.inter(
                                 fontSize: 22,
                               ),
                             ),
                             const SizedBox(
                               height: 20,
                             ),
-                            Text(
-                              'Learn More',
-                              style: GoogleFonts.nunito(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
+                            // Text(
+                            //   'Learn More',
+                            //   style: GoogleFonts.inter(
+                            //     fontSize: 18,
+                            //     fontWeight: FontWeight.bold,
+                            //     decoration: TextDecoration.underline,
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
@@ -414,8 +476,8 @@ class _LandingPageState extends State<LandingPage> {
                               height: 10,
                             ),
                             Text(
-                              'Scan QR code to discover ads!',
-                              style: GoogleFonts.nunito(
+                              'Offline to Online ads',
+                              style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 30,
                               ),
@@ -424,23 +486,23 @@ class _LandingPageState extends State<LandingPage> {
                               height: 10,
                             ),
                             Text(
-                              'Contrary to popular belief, Lore Ipsum is not simply random text. It has roots in a piece.',
+                              'Any offline marketing medium can be converted into online ads',
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.nunito(
+                              style: GoogleFonts.inter(
                                 fontSize: 22,
                               ),
                             ),
                             const SizedBox(
                               height: 20,
                             ),
-                            Text(
-                              'Learn More',
-                              style: GoogleFonts.nunito(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
+                            // Text(
+                            //   'Learn More',
+                            //   style: GoogleFonts.inter(
+                            //     fontSize: 18,
+                            //     fontWeight: FontWeight.bold,
+                            //     decoration: TextDecoration.underline,
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
@@ -453,198 +515,198 @@ class _LandingPageState extends State<LandingPage> {
               Column(
                 key: servicesKey,
                 children: [
-                  Column(
-                    children: [
-                      Text(
-                        'Give the most value out of your ads!',
-                        style: GoogleFonts.inter(
-                          fontSize: 36,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        'Who is Nextcent suitable for?',
-                        style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xFF717171)),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Card(
-                        color: Colors.white,
-                        child: Column(
-                          children: [
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Image.asset('assets/icons/adtip_advertiser.png'),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                  text: 'AdTip ',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: 'Advertiser\n',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 28,
-                                        color: const Color(0xFFE64646),
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'Panel',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 28,
-                                        color: const Color(0xFFE64646),
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ]),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Our membership provides you with all\n the tools you required to get ahead in\n the advertisement.',
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Card(
-                        color: Colors.white,
-                        child: Column(
-                          children: [
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Image.asset('assets/icons/adtip_consumer.png'),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                  text: 'AdTip ',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: 'Consumer\n',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 28,
-                                        color: const Color(0xFF11AD34),
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'Panel',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 28,
-                                        color: const Color(0xFF11AD34),
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ]),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Our membership includes consumer\n app which is free of cost to use in\n Play Store.',
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Card(
-                        color: Colors.white,
-                        child: Column(
-                          children: [
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Image.asset('assets/icons/adtip_analytics.png'),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                  text: 'Advance\n',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: 'Analytics',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 28,
-                                        color: const Color(0xFF11AD34),
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ]),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'You will get advanced analytics page\n to analyse posted ads and big room\n for growth.',
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Column(
+                  //   children: [
+                  //     Text(
+                  //       'Give the most value out of your ads!',
+                  //       style: GoogleFonts.inter(
+                  //         fontSize: 36,
+                  //         fontWeight: FontWeight.w600,
+                  //       ),
+                  //     ),
+                  //     Text(
+                  //       'Who is Nextcent suitable for?',
+                  //       style: GoogleFonts.inter(
+                  //           fontSize: 16,
+                  //           fontWeight: FontWeight.w400,
+                  //           color: const Color(0xFF717171)),
+                  //     ),
+                  //   ],
+                  // ),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  //   children: [
+                  //     Card(
+                  //       color: Colors.white,
+                  //       child: Column(
+                  //         children: [
+                  //           const SizedBox(
+                  //             height: 10,
+                  //           ),
+                  //           Image.asset('assets/icons/adtip_advertiser.png'),
+                  //           const SizedBox(
+                  //             height: 5,
+                  //           ),
+                  //           RichText(
+                  //             textAlign: TextAlign.center,
+                  //             text: TextSpan(
+                  //                 text: 'AdTip ',
+                  //                 style: GoogleFonts.inter(
+                  //                   fontSize: 28,
+                  //                   fontWeight: FontWeight.w700,
+                  //                 ),
+                  //                 children: [
+                  //                   TextSpan(
+                  //                     text: 'Advertiser\n',
+                  //                     style: GoogleFonts.inter(
+                  //                       fontSize: 28,
+                  //                       color: const Color(0xFFE64646),
+                  //                       fontWeight: FontWeight.w700,
+                  //                     ),
+                  //                   ),
+                  //                   TextSpan(
+                  //                     text: 'Panel',
+                  //                     style: GoogleFonts.inter(
+                  //                       fontSize: 28,
+                  //                       color: const Color(0xFFE64646),
+                  //                       fontWeight: FontWeight.w700,
+                  //                     ),
+                  //                   ),
+                  //                 ]),
+                  //           ),
+                  //           const SizedBox(
+                  //             height: 10,
+                  //           ),
+                  //           Padding(
+                  //             padding: const EdgeInsets.all(8.0),
+                  //             child: Text(
+                  //               'Our membership provides you with all\n the tools you required to get ahead in\n the advertisement.',
+                  //               textAlign: TextAlign.center,
+                  //               style: GoogleFonts.inter(
+                  //                 fontSize: 14,
+                  //                 fontWeight: FontWeight.w400,
+                  //               ),
+                  //             ),
+                  //           ),
+                  //           const SizedBox(
+                  //             height: 10,
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //     Card(
+                  //       color: Colors.white,
+                  //       child: Column(
+                  //         children: [
+                  //           const SizedBox(
+                  //             height: 10,
+                  //           ),
+                  //           Image.asset('assets/icons/adtip_consumer.png'),
+                  //           const SizedBox(
+                  //             height: 5,
+                  //           ),
+                  //           RichText(
+                  //             textAlign: TextAlign.center,
+                  //             text: TextSpan(
+                  //                 text: 'AdTip ',
+                  //                 style: GoogleFonts.inter(
+                  //                   fontSize: 28,
+                  //                   fontWeight: FontWeight.w700,
+                  //                 ),
+                  //                 children: [
+                  //                   TextSpan(
+                  //                     text: 'Consumer\n',
+                  //                     style: GoogleFonts.inter(
+                  //                       fontSize: 28,
+                  //                       color: const Color(0xFF11AD34),
+                  //                       fontWeight: FontWeight.w700,
+                  //                     ),
+                  //                   ),
+                  //                   TextSpan(
+                  //                     text: 'Panel',
+                  //                     style: GoogleFonts.inter(
+                  //                       fontSize: 28,
+                  //                       color: const Color(0xFF11AD34),
+                  //                       fontWeight: FontWeight.w700,
+                  //                     ),
+                  //                   ),
+                  //                 ]),
+                  //           ),
+                  //           const SizedBox(
+                  //             height: 10,
+                  //           ),
+                  //           Padding(
+                  //             padding: const EdgeInsets.all(8.0),
+                  //             child: Text(
+                  //               'Our membership includes consumer\n app which is free of cost to use in\n Play Store.',
+                  //               textAlign: TextAlign.center,
+                  //               style: GoogleFonts.inter(
+                  //                 fontSize: 14,
+                  //                 fontWeight: FontWeight.w400,
+                  //               ),
+                  //             ),
+                  //           ),
+                  //           const SizedBox(
+                  //             height: 10,
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //     Card(
+                  //       color: Colors.white,
+                  //       child: Column(
+                  //         children: [
+                  //           const SizedBox(
+                  //             height: 10,
+                  //           ),
+                  //           Image.asset('assets/icons/adtip_analytics.png'),
+                  //           const SizedBox(
+                  //             height: 5,
+                  //           ),
+                  //           RichText(
+                  //             textAlign: TextAlign.center,
+                  //             text: TextSpan(
+                  //                 text: 'Advance\n',
+                  //                 style: GoogleFonts.inter(
+                  //                   fontSize: 28,
+                  //                   fontWeight: FontWeight.w700,
+                  //                 ),
+                  //                 children: [
+                  //                   TextSpan(
+                  //                     text: 'Analytics',
+                  //                     style: GoogleFonts.inter(
+                  //                       fontSize: 28,
+                  //                       color: const Color(0xFF11AD34),
+                  //                       fontWeight: FontWeight.w700,
+                  //                     ),
+                  //                   ),
+                  //                 ]),
+                  //           ),
+                  //           const SizedBox(
+                  //             height: 10,
+                  //           ),
+                  //           Padding(
+                  //             padding: const EdgeInsets.all(8.0),
+                  //             child: Text(
+                  //               'You will get advanced analytics page\n to analyse posted ads and big room\n for growth.',
+                  //               textAlign: TextAlign.center,
+                  //               style: GoogleFonts.inter(
+                  //                 fontSize: 14,
+                  //                 fontWeight: FontWeight.w400,
+                  //               ),
+                  //             ),
+                  //           ),
+                  //           const SizedBox(
+                  //             height: 10,
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                   const SizedBox(
                     height: 50,
                   ),
@@ -658,7 +720,7 @@ class _LandingPageState extends State<LandingPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Your Advertiser's money deliver to\ncustomer wallet",
+                            "Your Advertiser's money deliver to\nviewer's wallet",
                             style: GoogleFonts.inter(
                               fontSize: 36,
                               fontWeight: FontWeight.w600,
@@ -667,18 +729,37 @@ class _LandingPageState extends State<LandingPage> {
                           const SizedBox(
                             height: 10,
                           ),
-                          Text(
-                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n'
-                            'Sed sit amet justo ipsum. Sed accumsan quam vitae est\n'
-                            'varius fringilla. Pellentesque placerat vestibulum lorem\n'
-                            'sed porta. Nullam mattis tristique iaculis. Nullam pulvinar\n'
-                            'sit amet risus pretium auctor. Etiam quis massa pulvinar,\n'
-                            'aliquam quam vitae, tempus sem. Donec elementum pulvinar odio.',
-                            style: GoogleFonts.inter(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xFF717171)),
-                          )
+                          SizedBox(
+                            width: Get.width / 2 - 200,
+                            child: Text(
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                              "Experience the future of advertising where every rupee spent reaches its true destination. Your advertising budget isn't just spent; it's invested directly into the wallets of your viewers. This ensures genuine engagement and appreciation from your audience.",
+                              style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xFF717171)),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          ElevatedButton(
+                              onPressed: () {
+                                Scrollable.ensureVisible(
+                                    contactKey.currentContext!,
+                                    duration:
+                                        const Duration(milliseconds: 300));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF01C8CF),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  )),
+                              child: const Text(
+                                'Book Ad Demo',
+                                style: TextStyle(color: Colors.white),
+                              ))
                         ],
                       )
                     ],
@@ -705,18 +786,37 @@ class _LandingPageState extends State<LandingPage> {
                           const SizedBox(
                             height: 10,
                           ),
-                          Text(
-                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n'
-                            'Sed sit amet justo ipsum. Sed accumsan quam vitae est\n'
-                            'varius fringilla. Pellentesque placerat vestibulum lorem\n'
-                            'sed porta. Nullam mattis tristique iaculis. Nullam pulvinar\n'
-                            'sit amet risus pretium auctor. Etiam quis massa pulvinar,\n'
-                            'aliquam quam vitae, tempus sem. Donec elementum pulvinar odio.',
-                            style: GoogleFonts.inter(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xFF717171)),
+                          SizedBox(
+                            width: Get.width / 2 - 200,
+                            child: Text(
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                              'To effectively connect with your audience through ads, begin with a simple sign-up process. Provide company information to establish credibility and transparency. Next, carefully select your target audience based on demographics, interests, and location to ensure your ads reach the right people. Make budget decisions aligned with your advertising goals and resources. Get, Set, launch your advertising campaign.',
+                              style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xFF717171)),
+                            ),
                           ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          ElevatedButton(
+                              onPressed: () {
+                                Scrollable.ensureVisible(
+                                    contactKey.currentContext!,
+                                    duration:
+                                        const Duration(milliseconds: 300));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF01C8CF),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  )),
+                              child: const Text(
+                                'Book Ad Demo',
+                                style: TextStyle(color: Colors.white),
+                              ))
                         ],
                       ),
                     ],
@@ -735,7 +835,7 @@ class _LandingPageState extends State<LandingPage> {
                         child: Center(
                           child: Text(
                             'How It Work',
-                            style: GoogleFonts.nunito(
+                            style: GoogleFonts.inter(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xFF2CA2A6)),
@@ -748,7 +848,7 @@ class _LandingPageState extends State<LandingPage> {
                       Text(
                         'Promote smarter\nwith easy earning for user..',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.nunito(
+                        style: GoogleFonts.inter(
                           fontSize: 50,
                           fontWeight: FontWeight.w700,
                         ),
@@ -759,20 +859,31 @@ class _LandingPageState extends State<LandingPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
-                            height: 112,
-                            width: 330,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF2CA2A6),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Center(
-                              child: Text(
-                                '01. Create Account',
-                                style: GoogleFonts.nunito(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedIndex = 0;
+                              });
+                            },
+                            child: Container(
+                              height: 112,
+                              width: 330,
+                              decoration: BoxDecoration(
+                                color: selectedIndex == 0
+                                    ? const Color(0xFF2CA2A6)
+                                    : const Color(0xFFF9F9F9),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '01. Create Account',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold,
+                                    color: selectedIndex == 0
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
@@ -780,19 +891,31 @@ class _LandingPageState extends State<LandingPage> {
                           const SizedBox(
                             width: 20,
                           ),
-                          Container(
-                            height: 112,
-                            width: 330,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF9F9F9),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Center(
-                              child: Text(
-                                '02. Add Products',
-                                style: GoogleFonts.nunito(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedIndex = 1;
+                              });
+                            },
+                            child: Container(
+                              height: 112,
+                              width: 330,
+                              decoration: BoxDecoration(
+                                color: selectedIndex == 1
+                                    ? const Color(0xFF2CA2A6)
+                                    : const Color(0xFFF9F9F9),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '02. Add Products',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold,
+                                    color: selectedIndex == 1
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
@@ -800,19 +923,31 @@ class _LandingPageState extends State<LandingPage> {
                           const SizedBox(
                             width: 20,
                           ),
-                          Container(
-                            height: 112,
-                            width: 330,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF9F9F9),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Center(
-                              child: Text(
-                                '03. Increase Sales',
-                                style: GoogleFonts.nunito(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedIndex = 2;
+                              });
+                            },
+                            child: Container(
+                              height: 112,
+                              width: 330,
+                              decoration: BoxDecoration(
+                                color: selectedIndex == 2
+                                    ? const Color(0xFF2CA2A6)
+                                    : const Color(0xFFF9F9F9),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '03. Increase Sales',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold,
+                                    color: selectedIndex == 2
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
@@ -827,7 +962,7 @@ class _LandingPageState extends State<LandingPage> {
                         children: [
                           SizedBox(
                             width: 582,
-                            height: 374,
+                            height: 500,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -839,29 +974,100 @@ class _LandingPageState extends State<LandingPage> {
                                     const SizedBox(
                                       width: 5,
                                     ),
-                                    Text(
-                                      'Create AdTip account\n& start your Ad\nCampaign',
-                                      style: GoogleFonts.nunito(
-                                        fontSize: 40,
-                                        fontWeight: FontWeight.bold,
+                                    if (selectedIndex == 0)
+                                      SizedBox(
+                                        width: 500,
+                                        child: Text(
+                                          data[0]['title'],
+                                          softWrap: true,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 40,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    if (selectedIndex == 1)
+                                      SizedBox(
+                                        width: 500,
+                                        child: Text(
+                                          data[1]['title'],
+                                          style: GoogleFonts.inter(
+                                            fontSize: 40,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    if (selectedIndex == 2)
+                                      SizedBox(
+                                        width: 500,
+                                        child: Text(
+                                          data[2]['title'],
+                                          style: GoogleFonts.inter(
+                                            fontSize: 40,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
                                   ],
                                 ),
                                 const SizedBox(
                                   height: 5,
                                 ),
-                                Text(
-                                  'It is a long established fact that a reader will be distracted by the readable content of a page from when looking at it layout. The point of using Lorem Ipsum',
-                                  style: GoogleFonts.nunito(
-                                    fontSize: 22,
+                                if (selectedIndex == 0)
+                                  SizedBox(
+                                    width: Get.width / 2 - 200,
+                                    child: Text(
+                                      data[0]['subtitle'],
+                                      softWrap: true,
+                                      overflow: TextOverflow.visible,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 22,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                if (selectedIndex == 1)
+                                  SizedBox(
+                                    width: Get.width / 2 - 200,
+                                    child: Text(
+                                      data[1]['subtitle'],
+                                      softWrap: true,
+                                      overflow: TextOverflow.visible,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 22,
+                                      ),
+                                    ),
+                                  ),
+                                if (selectedIndex == 2)
+                                  SizedBox(
+                                    width: Get.width / 2 - 200,
+                                    child: Text(
+                                      data[2]['subtitle'],
+                                      softWrap: true,
+                                      overflow: TextOverflow.visible,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 22,
+                                      ),
+                                    ),
+                                  ),
                                 const SizedBox(
                                   height: 5,
                                 ),
-                                const RoundedButton(
-                                    text: 'Get Started', color: 0xFF242331),
+                                InkWell(
+                                  onTap: () {
+                                    Get.to(const LoginScreen())?.then((value) =>
+                                        {
+                                          if (value != null)
+                                            {
+                                              Scrollable.ensureVisible(
+                                                  contactKey.currentContext!,
+                                                  duration: const Duration(
+                                                      milliseconds: 300))
+                                            }
+                                        });
+                                  },
+                                  child: const RoundedButton(
+                                      text: 'Get Started', color: 0xFF242331),
+                                ),
                               ],
                             ),
                           ),
@@ -877,279 +1083,536 @@ class _LandingPageState extends State<LandingPage> {
               ),
 
               /// ad models
-              Row(
-                key: adModelKey,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  SizedBox(
-                    width: 443,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const RoundedButton(text: 'Pricing', color: 0xFFEFECFF),
-                        const SizedBox(
-                          height: 10,
+              Padding(
+                padding: const EdgeInsets.only(left: 30, right: 30),
+                child: SizedBox(
+                  height: 900,
+                  width: Get.width,
+                  child: ListView(
+                    key: adModelKey,
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      // SizedBox(
+                      //   width: 443,
+                      //   child: Column(
+                      //     crossAxisAlignment: CrossAxisAlignment.start,
+                      //     children: [
+                      //       const RoundedButton(
+                      //           text: 'Pricing', color: 0xFFEFECFF),
+                      //       const SizedBox(
+                      //         height: 10,
+                      //       ),
+                      //       Text(
+                      //         'Simple and\nflexible pricing\nmodels',
+                      //         style: GoogleFonts.inter(
+                      //           fontSize: 50,
+                      //           fontWeight: FontWeight.w700,
+                      //         ),
+                      //       ),
+                      //       const SizedBox(
+                      //         height: 10,
+                      //       ),
+                      //       Text(
+                      //         'It is a long established fact that a reader the will be distracted by the readable content of a page from when looking at it layout. ',
+                      //         style: GoogleFonts.inter(
+                      //           fontSize: 22,
+                      //           color: const Color(0xFF797979),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF9F9F9),
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        Text(
-                          'Simple and\nflexible pricing\nmodels',
-                          style: GoogleFonts.nunito(
-                            fontSize: 50,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          'It is a long established fact that a reader the will be distracted by the readable content of a page from when looking at it layout. ',
-                          style: GoogleFonts.nunito(
-                            fontSize: 22,
-                            color: const Color(0xFF797979),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF9F9F9),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Master Ads',
-                          style: GoogleFonts.nunito(
-                            fontSize: 40,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                          width: 360,
-                          height: 1,
-                          color: const Color(0xFFD3D3D3),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              '₹2',
-                              style: GoogleFonts.nunito(
+                              'Master Ads',
+                              style: GoogleFonts.inter(
                                 fontSize: 40,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            Text(
-                              ' / lead',
-                              style: GoogleFonts.nunito(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              width: 360,
+                              height: 1,
+                              color: const Color(0xFFD3D3D3),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  '₹2',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Text(
+                                  ' / lead',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.only(
+                                  left: 10, right: 10, bottom: 5, top: 5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFCFFEECC),
+                                borderRadius: BorderRadius.circular(20),
                               ),
+                              child: Text(
+                                'Billed as prepaid charge',
+                                style: GoogleFonts.inter(
+                                    fontSize: 20,
+                                    color: const Color(0xFFC68A15)),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              width: 360,
+                              height: 1,
+                              color: const Color(0xFFD3D3D3),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              'Longer duration to convey detailed\nmessages effectively.'
+                              '(24*7 ad on\ntop of the page which is displayed when\nthe user opens app)',
+                              textAlign: TextAlign.start,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'Offering prime ad space for select advertisers.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'Multi-format support for versatility in ad creation.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'Ideal for brand awareness campaigns and\nproduct launches.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'Viewer is paid 30% to view and 70% if they\ninteract with the video.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'Interact with customers on voice call.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Get.to(const LoginScreen())?.then((value) => {
+                                      if (value != null)
+                                        {
+                                          Scrollable.ensureVisible(
+                                              contactKey.currentContext!,
+                                              duration: const Duration(
+                                                  milliseconds: 300))
+                                        }
+                                    });
+                              },
+                              child: const RoundedButton(
+                                  text: 'Get Started', color: 0xFF242331),
                             ),
                           ],
                         ),
-                        const SizedBox(
-                          height: 10,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF9F9F9),
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        Container(
-                          padding: const EdgeInsets.only(
-                              left: 10, right: 10, bottom: 5, top: 5),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFCFFEECC),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            'Billed as prepaid charge',
-                            style: GoogleFonts.nunito(
-                                fontSize: 20, color: const Color(0xFFC68A15)),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Container(
-                          width: 360,
-                          height: 1,
-                          color: const Color(0xFFD3D3D3),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          'Longer duration to convey detailed\nmessages effectively.',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.nunito(
-                              fontSize: 20, color: const Color(0xFF797979)),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'Exclusivity, offering prime ad space for\nselect advertisers.',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.nunito(
-                              fontSize: 20, color: const Color(0xFF797979)),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'Multi-format support for versatility in ad\ncreation.',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.nunito(
-                              fontSize: 20, color: const Color(0xFF797979)),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'Ideal for brand awareness campaigns and\nproduct launches.',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.nunito(
-                              fontSize: 20, color: const Color(0xFF797979)),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        const RoundedButton(
-                            text: 'Get Started', color: 0xFF242331),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF9F9F9),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Non-Skip Ads',
-                          style: GoogleFonts.nunito(
-                            fontSize: 40,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                          width: 360,
-                          height: 1,
-                          color: const Color(0xFFD3D3D3),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '₹3',
-                              style: GoogleFonts.nunito(
+                              'Non-Skip Ads',
+                              style: GoogleFonts.inter(
                                 fontSize: 40,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              width: 360,
+                              height: 1,
+                              color: const Color(0xFFD3D3D3),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  '₹3',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Text(
+                                  ' / lead',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.only(
+                                  left: 10, right: 10, bottom: 5, top: 5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFCFFEECC),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                'Billed as prepaid charge',
+                                style: GoogleFonts.inter(
+                                    fontSize: 20,
+                                    color: const Color(0xFFC68A15)),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              width: 360,
+                              height: 1,
+                              color: const Color(0xFFD3D3D3),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
                             Text(
-                              ' / lead',
-                              style: GoogleFonts.nunito(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
+                              'Advertisers benefit from guaranteed\nviewability and higher completion rates.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'Users enjoy an incentivized rewards only for\nfull ad engagement. ',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'If customer doesn’t see the ad, they don’t\nget money. There will be a pop up as shown.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'Incentivized rewards for watching  full ad.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'Viewer is paid 30% to view and 70% if\nthey like the video.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'Interact with customers on voice app.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Get.to(const LoginScreen())?.then((value) => {
+                                      if (value != null)
+                                        {
+                                          Scrollable.ensureVisible(
+                                              contactKey.currentContext!,
+                                              duration: const Duration(
+                                                  milliseconds: 300))
+                                        }
+                                    });
+                              },
+                              child: InkWell(
+                                onTap: () {
+                                  Get.to(const LoginScreen())?.then((value) => {
+                                        if (value != null)
+                                          {
+                                            Scrollable.ensureVisible(
+                                                contactKey.currentContext!,
+                                                duration: const Duration(
+                                                    milliseconds: 300))
+                                          }
+                                      });
+                                },
+                                child: const RoundedButton(
+                                    text: 'Get Started', color: 0xFF242331),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(
-                          height: 10,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF9F9F9),
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        Container(
-                          padding: const EdgeInsets.only(
-                              left: 10, right: 10, bottom: 5, top: 5),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFCFFEECC),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            'Billed as prepaid charge',
-                            style: GoogleFonts.nunito(
-                                fontSize: 20, color: const Color(0xFFC68A15)),
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'QR Video Ads',
+                              style: GoogleFonts.inter(
+                                fontSize: 40,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              width: 360,
+                              height: 1,
+                              color: const Color(0xFFD3D3D3),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  '₹3',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Text(
+                                  ' / lead',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.only(
+                                  left: 10, right: 10, bottom: 5, top: 5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFCFFEECC),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                'Billed as prepaid charge',
+                                style: GoogleFonts.inter(
+                                    fontSize: 20,
+                                    color: const Color(0xFFC68A15)),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              width: 360,
+                              height: 1,
+                              color: const Color(0xFFD3D3D3),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              'Bridge between offline and online\nmarketing efforts.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'Versatility in application, suitable for\nvarious industries.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'Convenient access to additional content.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'Incentivized rewards for watching  full ad.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              'Interactive storytelling for deeper\naudience engagement.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                              'Get database of users who have interacted with your ad.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                              'If the customer doesn’t view the ad,\nyour money spent will be refunded.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                              'If the customer is not entering their phone number\n'
+                              'after scanning and is not a viewer,\nthe money will not be credited.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                  fontSize: 20, color: const Color(0xFF797979)),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Get.to(const LoginScreen())?.then((value) => {
+                                      if (value != null)
+                                        {
+                                          Scrollable.ensureVisible(
+                                              contactKey.currentContext!,
+                                              duration: const Duration(
+                                                  milliseconds: 300))
+                                        }
+                                    });
+                              },
+                              child: InkWell(
+                                onTap: () {
+                                  Get.to(const LoginScreen())?.then((value) => {
+                                        if (value != null)
+                                          {
+                                            Scrollable.ensureVisible(
+                                                contactKey.currentContext!,
+                                                duration: const Duration(
+                                                    milliseconds: 300))
+                                          }
+                                      });
+                                },
+                                child: const RoundedButton(
+                                    text: 'Get Started', color: 0xFF242331),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Container(
-                          width: 360,
-                          height: 1,
-                          color: const Color(0xFFD3D3D3),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          'Guaranteed viewability for advertisers.',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.nunito(
-                              fontSize: 20, color: const Color(0xFF797979)),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'Higher completion rates compared to\ntraditional ads.',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.nunito(
-                              fontSize: 20, color: const Color(0xFF797979)),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'Uninterrupted viewing experience for\nusers.',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.nunito(
-                              fontSize: 20, color: const Color(0xFF797979)),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'Incentivized rewards for watching  full ad.',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.nunito(
-                              fontSize: 20, color: const Color(0xFF797979)),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'Reduced ad fatigue and frustration among\nusers.',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.nunito(
-                              fontSize: 20, color: const Color(0xFF797979)),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        const RoundedButton(
-                            text: 'Get Started', color: 0xFF242331),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
 
               /// contact
@@ -1163,7 +1626,7 @@ class _LandingPageState extends State<LandingPage> {
                   Text(
                     'Get connected with us & grab this\nopportunity!',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.nunito(
+                    style: GoogleFonts.inter(
                       fontSize: 36,
                       fontWeight: FontWeight.w300,
                     ),
@@ -1173,7 +1636,7 @@ class _LandingPageState extends State<LandingPage> {
                   ),
                   Text(
                     'Out team member will contact you after filling this form.',
-                    style: GoogleFonts.nunito(
+                    style: GoogleFonts.inter(
                       fontSize: 16,
                     ),
                   ),
@@ -1182,7 +1645,7 @@ class _LandingPageState extends State<LandingPage> {
                   ),
                   Container(
                     padding: const EdgeInsets.all(40),
-                    height: 1024,
+                    height: 600,
                     width: Get.width,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(24),
@@ -1201,7 +1664,7 @@ class _LandingPageState extends State<LandingPage> {
                                   fontSize: 44, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(
-                              height: 282,
+                              height: 220,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -1211,9 +1674,9 @@ class _LandingPageState extends State<LandingPage> {
                                     children: [
                                       Image.asset('assets/icons/email.png'),
                                       const SizedBox(
-                                        width: 10,
+                                        width: 20,
                                       ),
-                                      Text(
+                                      SelectableText(
                                         'hello@adtip.in',
                                         style: GoogleFonts.poppins(
                                           fontSize: 20,
@@ -1235,8 +1698,8 @@ class _LandingPageState extends State<LandingPage> {
                                         const SizedBox(
                                           width: 10,
                                         ),
-                                        Text(
-                                          '+91 8148147171',
+                                        SelectableText(
+                                          '+91 81481471712',
                                           style: GoogleFonts.poppins(
                                             fontSize: 20,
                                             color: Colors.white,
@@ -1245,27 +1708,40 @@ class _LandingPageState extends State<LandingPage> {
                                       ],
                                     ),
                                   ),
-                                  Row(
-                                    children: [
-                                      Image.asset('assets/icons/location.png'),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        'Andhra Pradesh, India',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 20,
-                                          color: Colors.white,
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  InkWell(
+                                    onTap: () async {
+                                      await Utils.launchWeb(
+                                          uri: Uri.parse(
+                                              'https://www.google.com/maps/place/AdTip/@17.7231673,83.3250019,17z/data=!3m1!4b1!4m6!3m5!1s0x3a3943a988e2d721:0x2a61e920c4a01444!8m2!3d17.7231673!4d83.3250019!16s%2Fg%2F11vxttv598?entry=ttu'));
+                                    },
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Image.asset(
+                                            'assets/icons/location.png'),
+                                        const SizedBox(
+                                          width: 10,
                                         ),
-                                      ),
-                                    ],
+                                        Text(
+                                          'AU South Campus,\nAndhra University,\nAndhra Pradesh, India,\nPincode:530003',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 20,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
                             SizedBox(
                               width: 228,
-                              height: 64,
+                              height: 40,
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -1389,23 +1865,52 @@ class _LandingPageState extends State<LandingPage> {
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Center(
-                                          child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Image.asset('assets/icons/send.png'),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text(
-                                            'Send Message',
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 20,
-                                              color: Colors.white,
-                                            ),
-                                          )
-                                        ],
-                                      )),
+                                          child: Obx(() => landingController
+                                                  .isLoading.value
+                                              ? const CircularProgressIndicator()
+                                              : InkWell(
+                                                  onTap: () async {
+                                                    if (formKey.currentState!
+                                                        .validate()) {
+                                                      formKey.currentState!
+                                                          .save();
+                                                      await landingController.submitWebsiteMessage(
+                                                          name:
+                                                              name.text.trim(),
+                                                          message: message.text
+                                                              .trim(),
+                                                          mobile: phoneNumber
+                                                              .text
+                                                              .trim(),
+                                                          type: categories[
+                                                              _selectedIndex]);
+                                                      name.text = '';
+                                                      phoneNumber.text = '';
+                                                      message.text = '';
+                                                      setState(() {});
+                                                    }
+                                                  },
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Image.asset(
+                                                          'assets/icons/send.png'),
+                                                      const SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Text(
+                                                        'Send Message',
+                                                        style:
+                                                            GoogleFonts.poppins(
+                                                          fontSize: 20,
+                                                          color: Colors.white,
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ))),
                                     )
                                   ],
                                 ),
@@ -1417,6 +1922,58 @@ class _LandingPageState extends State<LandingPage> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+
+              ///faq
+              Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: Column(
+                  key: faqKey,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: const [
+                    FAQWidget(
+                      title: 'What is AdTip?',
+                      subtitle:
+                          'AdTip is created to establish a commercial advertising space by setting up an innovative platform that allows the viewer to earn cash through in-app advertisements. Users can earn while watching ads, making the experience not only engaging but also rewarding.',
+                    ),
+                    FAQWidget(
+                        title: 'How does AdTip work?',
+                        subtitle:
+                            "Each rupee spent by advertisers for their ad will be directly credited to viewer's wallet for viewing the ad.  It's a win-win situation for both the parties.  Viewer's can withdraw the money at any time."),
+                    FAQWidget(
+                        title:
+                            'Is there a limit to how many ads I can watch daily?',
+                        subtitle: 'No'),
+                    FAQWidget(
+                        title: 'What type of ads will I see on AdTip?',
+                        subtitle:
+                            'Adtip features a variety of ads from different industries, including retail, technology, entertainment, and more.'),
+                    FAQWidget(
+                        title: 'Is AdTip free to use?',
+                        subtitle:
+                            'Yes, signing up and using Adtip to view ads and earn money is completely free for customers.'),
+                    FAQWidget(
+                        title: 'How can I sign up as an advertiser on Adtip?',
+                        subtitle:
+                            'Advertisers can sign up by visiting the Adtip website and creating an advertiser account. From there, you can create and manage your ad campaigns.'),
+                    FAQWidget(
+                        title:
+                            'What are the benefits of advertising with Adtip?',
+                        subtitle:
+                            'Advertising with Adtip not only reaches a targeted audience but also engages viewers more effectively by directly crediting money to their wallet, leading to higher ad retention and engagement rates.'),
+                    FAQWidget(
+                        title: 'Is my personal information safe with Adtip?',
+                        subtitle:
+                            'Yes, Adtip prioritizes the privacy and security of your personal information. We use advanced encryption and security protocols to protect your data. Please review our privacy policy for more details.'),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 20,
               ),
 
               /// footer
@@ -1442,6 +1999,7 @@ class _LandingPageState extends State<LandingPage> {
                     decoration: const BoxDecoration(color: Color(0xFF263238)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Column(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -1467,7 +2025,7 @@ class _LandingPageState extends State<LandingPage> {
                               height: 10,
                             ),
                             Text(
-                              'Copyright © 2024 AdTip pvt ltd.',
+                              'Copyright © 2024 AdTip (OPC) pvt ltd.',
                               style: GoogleFonts.inter(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
@@ -1488,8 +2046,8 @@ class _LandingPageState extends State<LandingPage> {
                             const SizedBox(
                               height: 10,
                             ),
-                            Text(
-                              '8148147171',
+                            SelectableText(
+                              '+91 81481471712',
                               style: GoogleFonts.inter(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
@@ -1499,7 +2057,7 @@ class _LandingPageState extends State<LandingPage> {
                             const SizedBox(
                               height: 10,
                             ),
-                            Text(
+                            SelectableText(
                               'hello@adtip.in',
                               style: GoogleFonts.inter(
                                 fontSize: 14,
@@ -1542,53 +2100,77 @@ class _LandingPageState extends State<LandingPage> {
                             const SizedBox(
                               height: 20,
                             ),
-                            Text(
-                              'About Adtip',
-                              style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white),
+                            InkWell(
+                              onTap: () {
+                                Scrollable.ensureVisible(
+                                    homeKey.currentContext!,
+                                    duration:
+                                        const Duration(milliseconds: 300));
+                              },
+                              child: Text(
+                                'About Adtip',
+                                style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white),
+                              ),
                             ),
                             const SizedBox(
                               height: 10,
                             ),
-                            Text(
-                              'Blog',
-                              style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white),
+                            // Text(
+                            //   'Blog',
+                            //   style: GoogleFonts.inter(
+                            //       fontSize: 14,
+                            //       fontWeight: FontWeight.w400,
+                            //       color: Colors.white),
+                            // ),
+                            // const SizedBox(
+                            //   height: 10,
+                            // ),
+                            InkWell(
+                              onTap: () {
+                                Scrollable.ensureVisible(
+                                    contactKey.currentContext!,
+                                    duration:
+                                        const Duration(milliseconds: 300));
+                              },
+                              child: Text(
+                                'Contact Us',
+                                style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white),
+                              ),
                             ),
                             const SizedBox(
                               height: 10,
                             ),
-                            Text(
-                              'Contact Us',
-                              style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white),
+                            InkWell(
+                              onTap: () {
+                                Scrollable.ensureVisible(
+                                    adModelKey.currentContext!,
+                                    duration:
+                                        const Duration(milliseconds: 300));
+                              },
+                              child: Text(
+                                'Ad Model Pricing',
+                                style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white),
+                              ),
                             ),
                             const SizedBox(
                               height: 10,
                             ),
-                            Text(
-                              'Ad Model Pricing',
-                              style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              'Clients',
-                              style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white),
-                            ),
+                            // Text(
+                            //   'Clients',
+                            //   style: GoogleFonts.inter(
+                            //       fontSize: 14,
+                            //       fontWeight: FontWeight.w400,
+                            //       color: Colors.white),
+                            // ),
                           ],
                         ),
                         Column(
@@ -1604,90 +2186,115 @@ class _LandingPageState extends State<LandingPage> {
                             const SizedBox(
                               height: 20,
                             ),
-                            Text(
-                              'Help Center',
-                              style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              'Terms of Service',
-                              style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              'Legal',
-                              style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              'Privacy Policy',
-                              style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              'Status',
-                              style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Stay up to date',
-                              style: GoogleFonts.inter(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            SizedBox(
-                              width: 300,
-                              height: 100,
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                  hintText: 'Your email address',
-                                  hintStyle: GoogleFonts.inter(
+                            Row(
+                              children: [
+                                Text(
+                                  'Help',
+                                  style: GoogleFonts.inter(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
                                       color: Colors.white),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: const BorderSide(
-                                        color: Colors.white, width: 2.0),
-                                  ),
-                                  suffixIcon:
-                                      Image.asset('assets/icons/send.png'),
                                 ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                SelectableText(
+                                  '+91 81481471712',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Get.to(const TermsOfServiceText());
+                              },
+                              child: Text(
+                                'Terms of Service',
+                                style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white),
                               ),
-                            )
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            // Text(
+                            //   'Legal',
+                            //   style: GoogleFonts.inter(
+                            //       fontSize: 14,
+                            //       fontWeight: FontWeight.w400,
+                            //       color: Colors.white),
+                            // ),
+                            // const SizedBox(
+                            //   height: 10,
+                            // ),
+                            InkWell(
+                              onTap: () {
+                                Get.to(const PrivacyPolicyText());
+                              },
+                              child: Text(
+                                'Privacy Policy',
+                                style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            // Text(
+                            //   'Status',
+                            //   style: GoogleFonts.inter(
+                            //       fontSize: 14,
+                            //       fontWeight: FontWeight.w400,
+                            //       color: Colors.white),
+                            // ),
                           ],
-                        )
+                        ),
+                        // Column(
+                        //   crossAxisAlignment: CrossAxisAlignment.start,
+                        //   children: [
+                        //     Text(
+                        //       'Stay up to date',
+                        //       style: GoogleFonts.inter(
+                        //           fontSize: 20,
+                        //           fontWeight: FontWeight.w600,
+                        //           color: Colors.white),
+                        //     ),
+                        //     const SizedBox(
+                        //       height: 20,
+                        //     ),
+                        //     SizedBox(
+                        //       width: 300,
+                        //       height: 100,
+                        //       child: TextFormField(
+                        //         decoration: InputDecoration(
+                        //           hintText: 'Your email address',
+                        //           hintStyle: GoogleFonts.inter(
+                        //               fontSize: 14,
+                        //               fontWeight: FontWeight.w400,
+                        //               color: Colors.white),
+                        //           border: OutlineInputBorder(
+                        //             borderRadius: BorderRadius.circular(10.0),
+                        //             borderSide: const BorderSide(
+                        //                 color: Colors.white, width: 2.0),
+                        //           ),
+                        //           suffixIcon:
+                        //               Image.asset('assets/icons/send.png'),
+                        //         ),
+                        //       ),
+                        //     )
+                        //   ],
+                        // )
                       ],
                     ),
                   ),
@@ -1716,13 +2323,46 @@ class RoundedButton extends StatelessWidget {
       child: Center(
         child: Text(
           text,
-          style: GoogleFonts.nunito(
+          style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w500,
             color: const Color(0xFF1AD4D9),
           ),
         ),
       ),
+    );
+  }
+}
+
+class FAQWidget extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  const FAQWidget({super.key, required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: 30,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Text(
+          subtitle,
+          softWrap: true,
+          style: GoogleFonts.inter(fontSize: 14),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+      ],
     );
   }
 }

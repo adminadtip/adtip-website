@@ -19,6 +19,8 @@ import '../model/create_company_model.dart';
 
 class CreateCompanyController extends GetxController {
   final _userCompanyProfile = CreateCompanyModelRequestData().obs;
+  Rx<int> selectedCompany = 0.obs;
+  Rx<int> selectedCompanyId = 0.obs;
   CreateCompanyModelRequestData get userCompanyProfile =>
       _userCompanyProfile.value;
 
@@ -49,6 +51,11 @@ class CreateCompanyController extends GetxController {
       print('error $e');
     }
     return false;
+  }
+
+  void changeCompanyIndex({required int index, required int companyId}) {
+    selectedCompany.value = index;
+    selectedCompanyId.value = companyId;
   }
 
   Future<bool> pickCompanyProfileImage() async {
@@ -155,46 +162,23 @@ class CreateCompanyController extends GetxController {
   //   } catch (e) {}
   // }
 
-  Future<List<CompanyDetail>> fetchCompanyList(userId) async {
+  Future<List<CompanyDetail>> fetchCompanyList() async {
+    final int? userId =
+        LocalPrefs().getIntegerPref(key: SharedPreferenceKey.UserId);
     try {
-      fetchedCompanyList.clear();
       _isLoading.value = true;
-      final jsonResponse = await _apiServices
-          .getApi('${UrlConstants.getCompanyListURL}$_userId');
+      final jsonResponse =
+          await _apiServices.getApi('${UrlConstants.getCompanyListURL}$userId');
       List<dynamic> companyDataList = jsonResponse['data'];
       fetchedCompanyList = companyDataList
           .map((item) => CompanyDetail.fromJson(item as Map<String, dynamic>))
           .toList();
-      // http.Response res = await http.get(
-      //   Uri.parse('${UrlConstants.BASE_URL}getcompanylist/$userId'),
-      //   headers: {
-      //     'Content-Type': 'application/json; charset=UTF-8',
-      //     "authorization":
-      //         "Bearer ${LocalPrefs().getStringPref(key: SharedPreferenceKey.UserLoggedIn)}"
-      //   },
-      // );
-      // if (res.statusCode == 200) {
-      //   Map<String, dynamic> jsonResponse = json.decode(res.body);
-      //   // Check if "data" is a list
-      //   if (jsonResponse['status'] == 200) {
-      //     if (jsonResponse['data'] is List) {
-      //       // Extract the "name" and "industry" fields and store them in a list
-      //       List<dynamic> companyDataList = jsonResponse['data'];
-      //       fetchedCompanyList = companyDataList
-      //           .map((item) =>
-      //               CompanyDetail.fromJson(item as Map<String, dynamic>))
-      //           .toList();
-      //     }
-      //   } else if (jsonResponse['status'] == 500) {
-      //     PhoneLoginController contrl = Get.put(PhoneLoginController());
-      //     contrl.logOutUser();
-      //     Get.to(() => const CreateAccountPage());
-      //   } else {
-      //     // Handle the case where "data" is not a list
-      //   }
-      // }
       _isLoading.value = false;
+      if (fetchedCompanyList.isNotEmpty) {
+        selectedCompanyId.value = fetchedCompanyList[0].id!;
+      }
     } catch (e) {
+      print('error occurred $e');
       _isLoading.value = false;
     }
     return fetchedCompanyList;
@@ -226,5 +210,20 @@ class CreateCompanyController extends GetxController {
       }
       _isLoading.value = false;
     } catch (e) {}
+  }
+
+  Future<void> deleteCompany({required int companyId}) async {
+    try {
+      final body = {
+        'id': companyId,
+      };
+      final response = await _apiServices.postApi(
+        body,
+        UrlConstants.deleteCompany,
+      );
+      print('response delteing company ${response}');
+    } catch (e) {
+      print('error occurred deleting company $e');
+    }
   }
 }

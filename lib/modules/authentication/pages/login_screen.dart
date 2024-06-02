@@ -22,9 +22,14 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Image.asset(
-            'assets/images/login.png',
-            fit: BoxFit.fitHeight,
+          InkWell(
+            onTap: () {
+              Navigator.of(context).pop('data');
+            },
+            child: Image.asset(
+              'assets/images/login.png',
+              fit: BoxFit.fitHeight,
+            ),
           ),
           const SizedBox(
             width: 30,
@@ -69,6 +74,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (value!.isEmpty) {
                         return 'Please enter mobile number';
                       }
+                      if (value.length < 10) {
+                        return 'Please enter valid mobile number';
+                      }
                       return null;
                     },
                     decoration: InputDecoration(
@@ -89,8 +97,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black),
                           onPressed: () async {
-                            await loginController.sendOTP(
-                                mobileNumber: mobileController.text);
+                            if (formKey.currentState!.validate()) {
+                              formKey.currentState!.save();
+                              await loginController.sendOTP(
+                                  mobileNumber: mobileController.text);
+                            }
                           },
                           child: const Text(
                             'Sent OTP',

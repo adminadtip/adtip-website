@@ -1,8 +1,7 @@
-
 import 'package:get/get.dart';
 
 class DropDisplayAdController extends GetxController {
-  List<String> menuPlatform = ['AdHub', 'AdTips Reel', 'AdTips Cart', 'Job'];
+  List<String> menuPlatform = ['PlayTip', 'InShorts', 'AdTips Cart'];
   final isSelectedAll = false.obs;
   final selectedList = <dynamic>[].obs;
 

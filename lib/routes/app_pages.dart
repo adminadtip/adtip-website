@@ -1,3 +1,5 @@
+import 'package:adtip_web_3/modules/ad_model/ad_model.dart';
+import 'package:adtip_web_3/modules/ad_model/bindings/ad_models_binding.dart';
 import 'package:adtip_web_3/modules/authentication/bindings/landingBinding.dart';
 import 'package:adtip_web_3/modules/authentication/pages/landing_page.dart';
 import 'package:get/get.dart';
@@ -21,6 +23,14 @@ class AppPages {
         name: _Paths.LANDING,
         page: () => const LandingPage(),
         binding: LandingBinding()),
+    GetPage(
+        name: _Paths.AdModels,
+        page: () => AdModelScreen(),
+        binding: AdModelsBindings()),
+    GetPage(
+        name: _Paths.AdModels,
+        page: () => AdModelScreen(),
+        binding: AdModelsBindings()),
     // GetPage(
     //   name: _Paths.DASHBOARD,
     //   page: () => const DashBoardScreen(),

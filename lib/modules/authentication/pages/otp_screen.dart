@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -92,6 +93,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
   otpFiled() {
     return Pinput(
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       length: 6,
       controller: controller,
       defaultPinTheme: PinTheme(
