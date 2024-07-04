@@ -2,6 +2,7 @@ import 'package:adtip_web_3/modules/ad_model/page/ad_tracking.dart';
 import 'package:adtip_web_3/modules/authentication/pages/landing_page.dart';
 import 'package:adtip_web_3/modules/createCompany/page/company_page.dart';
 import 'package:adtip_web_3/modules/dashboard/pages/dashboard_home.dart';
+import 'package:adtip_web_3/modules/refer_earn/page/refer_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -69,6 +70,9 @@ class DashboardController extends GetxController {
 
     const EditButtonPage(), //17
     const ProductDetailScreen(), //18
+
+    ///refer and earn
+    const ReferPage(), //19
   ];
 
   changeWidget({required int value}) {

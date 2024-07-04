@@ -14,17 +14,16 @@ import '../../../helpers/utils/utils.dart';
 import '../../createCompany/controller/imageItem.dart';
 import '../controller/qr_ad_controller.dart';
 import '../models/company_list_model.dart';
+import '../models/qr_ad_details_model.dart';
 import 'custom_image_view.dart';
 
 class QrCodeImageVideoView extends StatefulWidget {
-  const QrCodeImageVideoView(
-      {super.key,
-      required this.qrCodeValue,
-      required this.getCompanyModel,
-      required this.adId});
-  final String qrCodeValue;
-  final GetCompanyModel getCompanyModel;
-  final int adId;
+  const QrCodeImageVideoView({
+    super.key,
+    required this.qrAdDetailsModel,
+  });
+
+  final QrAdDetailsModel qrAdDetailsModel;
 
   @override
   State<QrCodeImageVideoView> createState() => _QrCodeImageVideoViewState();
@@ -44,7 +43,7 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    qrCodeAdDisplayController.checkAdValid(widget.adId);
+    qrCodeAdDisplayController.checkAdValid(widget.qrAdDetailsModel.adId);
     initializeVideo();
     //_startTimer();
   }
@@ -62,17 +61,17 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
               context: context,
               builder: (context) {
                 return AlertDialog(
-                  title: const Text('Wow!, You earned ₹5,'),
+                  title: const Text('Wow!, You earned ₹3,'),
                   content: const Text('Fill the form to get the money.'),
                   actions: [
                     TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                           Get.to(QrAddDetails(
-                              companyId: widget.getCompanyModel.data[0].id,
-                              adId: widget.adId,
+                              companyId: widget.qrAdDetailsModel.companyId,
+                              adId: widget.qrAdDetailsModel.adId,
                               companyName:
-                                  widget.getCompanyModel.data[0].name ?? ''));
+                                  widget.qrAdDetailsModel.companyName ?? ''));
                         },
                         child: const Text('Fill Form')),
                     TextButton(
@@ -104,14 +103,14 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
   }
 
   void initializeVideo() {
-    videoPlayerController =
-        VideoPlayerController.networkUrl(Uri.parse(widget.qrCodeValue))
-          ..initialize().then((_) {
-            videoPlayerController.setVolume(0);
-            videoPlayerController.play();
-            videoPlayerController.setLooping(true);
-            setState(() {});
-          });
+    videoPlayerController = VideoPlayerController.networkUrl(
+        Uri.parse(widget.qrAdDetailsModel.adUrl))
+      ..initialize().then((_) {
+        videoPlayerController.setVolume(0);
+        videoPlayerController.play();
+        videoPlayerController.setLooping(true);
+        setState(() {});
+      });
 
     videoPlayerController.addListener(_videoPlayerListener);
     // videoPlayerController.addListener(() async {
@@ -137,9 +136,7 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
     }
 
     if (videoPlayerController.value.isInitialized &&
-        videoPlayerController.value.isCompleted) {
-      if (widget.adId != null) {}
-    }
+        videoPlayerController.value.isCompleted) {}
 
     videoPlayerController.removeListener(_videoPlayerListener);
   }
@@ -156,6 +153,9 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    if (kDebugMode) {
+      print('cover image ${widget.qrAdDetailsModel.companyProfile}');
+    }
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: PopScope(
@@ -224,9 +224,7 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
               ),
             );
           }
-          if (kDebugMode) {
-            print('image ${widget.getCompanyModel.data[0].coverImage}');
-          }
+
           return Padding(
             padding: const EdgeInsets.only(
               left: 20,
@@ -241,49 +239,30 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
                     elevation: 5,
                     child: Column(
                       children: [
-                        SizedBox(
-                          height: size.height * 0.01,
+                        const SizedBox(
+                          height: 10,
                         ),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            SizedBox(
-                              width: size.width * 0.03,
+                            Image.network(
+                              widget.qrAdDetailsModel.companyProfile ?? '',
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
                             ),
-                            widget.getCompanyModel.data.isEmpty
-                                ? const SizedBox(
-                                    width: 100,
-                                    height: 100,
-                                  )
-                                : widget.getCompanyModel.data[0].coverImage ==
-                                        null
-                                    ? SizedBox(
-                                        width: 100,
-                                        height: 100,
-                                        child: Image.asset(
-                                          'assets/images/Rectangle1.png',
-                                          width: 100,
-                                          height: 100,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )
-                                    : Image.network(
-                                        widget.getCompanyModel.data[0]
-                                                .coverImage ??
-                                            '',
-                                        width: 100,
-                                        height: 100,
-                                        fit: BoxFit.cover,
-                                      ),
                             const SizedBox(
-                              width: 10,
+                              width: 100,
+                              child: Text(
+                                "Complete watching the ad to earn upto ₹100",
+                                style: TextStyle(fontSize: 12),
+                              ),
                             ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  widget.getCompanyModel.data.isEmpty
-                                      ? ''
-                                      : widget.getCompanyModel.data[0].name!,
+                                  widget.qrAdDetailsModel.companyName,
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
@@ -296,19 +275,15 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
                                   children: [
                                     InkWell(
                                       onTap: () async {
-                                        if (widget.getCompanyModel.data[0]
-                                                .website !=
+                                        if (widget.qrAdDetailsModel.adWebsite !=
                                             '') {
                                           await Utils.launchWeb(
                                               uri: Uri.parse(
-                                                  'https://${widget.getCompanyModel.data[0].website}'));
+                                                  '${widget.qrAdDetailsModel.adWebsite}'));
                                         }
                                       },
                                       child: Text(
-                                        widget.getCompanyModel.data.isEmpty
-                                            ? ''
-                                            : widget.getCompanyModel.data[0]
-                                                .website!,
+                                        widget.qrAdDetailsModel.adWebsite,
                                         style: const TextStyle(
                                           decoration: TextDecoration.underline,
                                           decorationColor:
@@ -324,33 +299,35 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
                                       AdtipAssets.ARROW_UP,
                                       height: 15,
                                       width: 15,
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Utils.showAlertDialogForQrAdVideo(
+                                            context: context,
+                                            title: 'Install app to follow');
+                                      },
+                                      child: const Text(
+                                        "Follow",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                        ),
+                                      ),
                                     )
                                   ],
                                 ),
                               ],
                             ),
-                            const Spacer(),
-                            TextButton(
-                              onPressed: () {
-                                Utils.showAlertDialogForQrAdVideo(
-                                    context: context,
-                                    title: 'Install app to follow');
-                              },
-                              child: const Text(
-                                "Follow",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            )
                           ],
                         ),
                         SizedBox(
                           height: size.height * 0.02,
                         ),
                         isVideo(
-                          url: widget.qrCodeValue,
+                          url: widget.qrAdDetailsModel.adUrl,
                         )
                             ? SizedBox(
                                 height:
@@ -406,7 +383,7 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
                                                   builder: (context) {
                                                     return AlertDialog(
                                                       title: const Text(
-                                                          'Wow!, You earned ₹5,'),
+                                                          'Wow!, You earned ₹3,'),
                                                       content: const Text(
                                                           'Fill the form to get the money.'),
                                                       actions: [
@@ -417,17 +394,14 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
                                                                   .pop();
                                                               Get.to(QrAddDetails(
                                                                   companyId: widget
-                                                                      .getCompanyModel
-                                                                      .data[0]
-                                                                      .id,
+                                                                      .qrAdDetailsModel
+                                                                      .companyId,
                                                                   adId: widget
+                                                                      .qrAdDetailsModel
                                                                       .adId,
                                                                   companyName: widget
-                                                                          .getCompanyModel
-                                                                          .data[
-                                                                              0]
-                                                                          .name ??
-                                                                      ''));
+                                                                      .qrAdDetailsModel
+                                                                      .companyName));
                                                             },
                                                             child: const Text(
                                                                 'Fill Form')),
@@ -477,7 +451,7 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
                                 ),
                               )
                             : CustomImageView(
-                                imagePath: widget.qrCodeValue,
+                                imagePath: widget.qrAdDetailsModel.adUrl,
                                 height: size.height * 0.3,
                                 width: double.infinity,
                               ),
@@ -545,19 +519,19 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
                                                 title: const Text(
                                                     "Wait! You're loosing money!"),
                                                 content: const Text(
-                                                    'Continue Watching to earn cash'),
+                                                    'Continue Watching to earn ₹3'),
                                                 actions: [
                                                   TextButton(
                                                     onPressed: () {
                                                       Navigator.of(context)
                                                           .pop();
                                                       setState(() {
-                                                        videoPlayerController
-                                                            .play();
-                                                        videoPlayerController
-                                                            .dispose();
                                                         _periodicTimer.cancel();
                                                       });
+                                                      Utils.launchWeb(
+                                                          uri: Uri.parse(
+                                                              StringConstants
+                                                                  .googlePlayLink));
                                                     },
                                                     child: const Text('Skip'),
                                                   ),
@@ -568,9 +542,9 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
                                                                   .value
                                                                   .isPlaying
                                                               ? videoPlayerController
-                                                                  .pause()
+                                                                  ?.pause()
                                                               : videoPlayerController
-                                                                  .play();
+                                                                  ?.play();
 
                                                           _toggleTimer();
                                                         });
@@ -660,7 +634,7 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
                                           builder: (context) {
                                             return AlertDialog(
                                               title: const Text(
-                                                  'Wow!, You earned ₹5,'),
+                                                  'Wow!, You earned ₹3,'),
                                               content: const Text(
                                                   'Fill the form to get the money.'),
                                               actions: [
@@ -670,15 +644,14 @@ class _QrCodeImageVideoViewState extends State<QrCodeImageVideoView> {
                                                           .pop();
                                                       Get.to(QrAddDetails(
                                                           companyId: widget
-                                                              .getCompanyModel
-                                                              .data[0]
-                                                              .id,
-                                                          adId: widget.adId,
+                                                              .qrAdDetailsModel
+                                                              .companyId,
+                                                          adId: widget
+                                                              .qrAdDetailsModel
+                                                              .adId,
                                                           companyName: widget
-                                                                  .getCompanyModel
-                                                                  .data[0]
-                                                                  .name ??
-                                                              ''));
+                                                              .qrAdDetailsModel
+                                                              .companyName));
                                                     },
                                                     child: const Text(
                                                         'Fill Form')),

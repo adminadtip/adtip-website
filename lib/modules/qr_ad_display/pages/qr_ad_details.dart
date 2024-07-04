@@ -145,7 +145,7 @@ class _QrAddDetailsState extends State<QrAddDetails> {
                       height: 20,
                     ),
                     const Text(
-                      'You earned ₹5, enter details to get the money.',
+                      'You earned ₹3, enter details to get the money.',
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(
@@ -422,7 +422,7 @@ class _QrAddDetailsState extends State<QrAddDetails> {
                                                         }
                                                         Future.delayed(
                                                             const Duration(
-                                                                seconds: 2),
+                                                                seconds: 1),
                                                             () {
                                                           Utils.launchWeb(
                                                               uri: Uri.parse(

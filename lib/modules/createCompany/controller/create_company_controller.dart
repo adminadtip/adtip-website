@@ -21,6 +21,14 @@ class CreateCompanyController extends GetxController {
   final _userCompanyProfile = CreateCompanyModelRequestData().obs;
   Rx<int> selectedCompany = 0.obs;
   Rx<int> selectedCompanyId = 0.obs;
+
+  ///for create company first page
+  RxList<CompanyDetail> checkCompanyList = <CompanyDetail>[].obs;
+  RxString errorMessageForCompanyExist = ''.obs;
+  RxBool isCompanyNameAlreadyUsed = true.obs;
+  RxBool isCheckingCompanyName = false.obs;
+
+  ///for create company first page
   CreateCompanyModelRequestData get userCompanyProfile =>
       _userCompanyProfile.value;
 
@@ -29,7 +37,8 @@ class CreateCompanyController extends GetxController {
 
   final Rx<File> _imageCompanyProfile = File('').obs;
   Rx<File>? get imageCompanyProfile => _imageCompanyProfile;
-  List<CompanyDetail> fetchedCompanyList = [];
+  //List<CompanyDetail> fetchedCompanyLis = [];
+  RxList<CompanyDetail> fetchedCompanyList = <CompanyDetail>[].obs;
   RxString coverImage = ''.obs;
   RxString profileImage = ''.obs;
 
@@ -37,6 +46,7 @@ class CreateCompanyController extends GetxController {
   RxString get buttonSelected => _buttonSelected;
 
   final _isLoading = false.obs;
+  Rx<bool> fetchingCompany = false.obs;
   RxBool get isLoading => _isLoading;
   final int? _userId =
       LocalPrefs().getIntegerPref(key: SharedPreferenceKey.UserId);
@@ -108,108 +118,68 @@ class CreateCompanyController extends GetxController {
     }
   }
 
-  // Future<void> createCompanyPage() async {
-  //   try {
-  //     _isLoading.value = true;
-  //     const url = "${UrlConstants.BASE_URL}createcompany";
-  //     final uri = Uri.parse(url);
-  //     var request = http.MultipartRequest('POST', uri);
-  //     print(
-  //         "beartoken ${LocalPrefs().getStringPref(key: SharedPreferenceKey.UserLoggedIn)}");
-  //     request.headers.addAll({
-  //       'Content-Type': 'application/json',
-  //       "authorization":
-  //           "Bearer ${LocalPrefs().getStringPref(key: SharedPreferenceKey.UserLoggedIn)}"
-  //     });
-  //     // request.files.add(await http.MultipartFile.fromPath(
-  //     //     'coverImage', imageBanner!.value.path));
-  //     //
-  //     // request.files.add(await http.MultipartFile.fromPath(
-  //     //     "profileImage", imageCompanyProfile!.value.path));
-  //     request.fields["coverimage"] =
-  //         'https://www.wallpaperbetter.com/wallpaper/975/878/515/cat-painting-kitten-paper-paint-splatter-1080P-wallpaper-middle-size.jpg';
-  //     request.fields["profileimage"] =
-  //         'https://www.wallpaperbetter.com/wallpaper/975/878/515/cat-painting-kitten-paper-paint-splatter-1080P-wallpaper-middle-size.jpg';
-  //
-  //     request.fields["name"] = _userCompanyProfile.value.companyName ?? "";
-  //     request.fields['email'] = _userCompanyProfile.value.companyEmail ?? '';
-  //     request.fields["website"] = _userCompanyProfile.value.websiteUrl ?? "";
-  //     request.fields["location"] = _userCompanyProfile.value.location ?? "";
-  //     request.fields["phone"] = _userCompanyProfile.value.phoneNumber ?? "";
-  //     request.fields["industry"] = _userCompanyProfile.value.companyType ?? "";
-  //     request.fields["about"] = _userCompanyProfile.value.description ?? "";
-  //     request.fields["button"] = _userCompanyProfile.value.buttonType ?? '';
-  //     request.fields["createdby"] = _userId.toString();
-  //
-  //     var streamedResponse = await request.send();
-  //
-  //     var response = await http.Response.fromStream(streamedResponse);
-  //     print("## response:" + response.body);
-  //     if (response.statusCode == 200) {
-  //       Map resp = json.decode(response.body);
-  //       Get.offAll(DashBoardPage());
-  //       Get.off(MyCompanyPage(
-  //         companyID: resp["data"][0]["id"].toString(),
-  //       ));
-  //     } else if (response.statusCode == 413) {
-  //       showfailedMessage("Request Entity too large");
-  //       _isLoading.value = false;
-  //     } else {
-  //       showfailedMessage(jsonDecode(response.body)["message"]);
-  //       _isLoading.value = false;
-  //     }
-  //     _isLoading.value = false;
-  //   } catch (e) {}
-  // }
-
   Future<List<CompanyDetail>> fetchCompanyList() async {
     final int? userId =
         LocalPrefs().getIntegerPref(key: SharedPreferenceKey.UserId);
     try {
+      fetchingCompany.value = true;
       _isLoading.value = true;
       final jsonResponse =
           await _apiServices.getApi('${UrlConstants.getCompanyListURL}$userId');
       List<dynamic> companyDataList = jsonResponse['data'];
-      fetchedCompanyList = companyDataList
+      fetchedCompanyList.value = companyDataList
           .map((item) => CompanyDetail.fromJson(item as Map<String, dynamic>))
           .toList();
       _isLoading.value = false;
+
       if (fetchedCompanyList.isNotEmpty) {
         selectedCompanyId.value = fetchedCompanyList[0].id!;
       }
+      fetchingCompany.value = false;
     } catch (e) {
+      fetchingCompany.value = false;
       print('error occurred $e');
       _isLoading.value = false;
+    } finally {
+      fetchingCompany.value = false;
     }
     return fetchedCompanyList;
   }
 
-  void generateCompanyQR(int companyID) async {
+  void fetchCompaniesList(String value) async {
     try {
-      _isLoading.value = true;
-      http.Response res = await http.get(
-        Uri.parse('${UrlConstants.BASE_URL}QRCode/$companyID'),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          "authorization":
-              "Bearer ${LocalPrefs().getStringPref(key: SharedPreferenceKey.UserLoggedIn)}"
-        },
-      );
-      if (res.statusCode == 200) {
-        final bytes = res.bodyBytes;
-        final temp = await getTemporaryDirectory();
-        final path = '${temp.path}/image.png';
-        File(path).writeAsBytesSync(bytes);
+      final int? userId =
+          LocalPrefs().getIntegerPref(key: SharedPreferenceKey.UserId);
+      isCheckingCompanyName.value = true;
+      final jsonResponse =
+          await _apiServices.getApi('${UrlConstants.getCompanyListURL}$userId');
+      List<dynamic> companyDataList = jsonResponse['data'];
+      checkCompanyList.value = companyDataList
+          .map((item) => CompanyDetail.fromJson(item as Map<String, dynamic>))
+          .toList();
 
-        await Share.shareXFiles([
-          XFile(path),
-        ], text: "Hello ! Checkout my Company Profile");
-      } else {
-        Utils.showErrorMessage('Error Getting Company QR');
-        _isLoading.value = false;
+      if (checkCompanyList.isNotEmpty) {
+        var result = checkCompanyList.firstWhere(
+            (element) =>
+                element.name!.toLowerCase().removeAllWhitespace ==
+                value.toLowerCase().removeAllWhitespace,
+            orElse: () => CompanyDetail());
+        print('name ${result.name}');
+        if (result.name != null) {
+          isCompanyNameAlreadyUsed.value = true;
+          print('company name exist');
+          errorMessageForCompanyExist.value = 'Company name Already Taken!';
+        } else {
+          print('company name does not exist');
+          isCompanyNameAlreadyUsed.value = false;
+          errorMessageForCompanyExist.value = '';
+        }
       }
-      _isLoading.value = false;
-    } catch (e) {}
+      isCheckingCompanyName.value = false;
+    } catch (e) {
+      print('error $e');
+      isCheckingCompanyName.value = false;
+    }
   }
 
   Future<void> deleteCompany({required int companyId}) async {

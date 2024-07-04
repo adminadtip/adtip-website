@@ -66,6 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // height: 200,
                   child: TextFormField(
                     controller: mobileController,
+                    maxLength: 10,
                     keyboardType: TextInputType.number,
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly

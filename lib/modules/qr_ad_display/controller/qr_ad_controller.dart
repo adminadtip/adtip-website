@@ -5,17 +5,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
+import '../../../helpers/constants/string_constants.dart';
 import '../../../helpers/constants/url_constants.dart';
+import '../../../helpers/local_database/local_prefs.dart';
+import '../../../helpers/local_database/sharedpref_key.dart';
 import '../../../helpers/utils/utils.dart';
 import '../../../netwrok/network_api_services.dart';
 import '../models/company_list_model.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/qr_ad_details_model.dart';
 import '../widgets/qr_code_video_image_ad_view.dart';
 
 class QrCodeAdDisplayController extends GetxController {
   GetCompanyModel? getCompanyModel;
   QrAdWebModel? qrAdWebModel;
+  RxList<QrAdDetailsModel> qrAdDetailsData = <QrAdDetailsModel>[].obs;
   Rx<bool> loadingQrAdWebData = false.obs;
   Rx<bool> isLoading = false.obs;
   final _apiServices = NetworkApiServices();
@@ -40,35 +45,54 @@ class QrCodeAdDisplayController extends GetxController {
       }
 
       if (path.isNotEmpty) {
-        if (path == '/video/') {
-          Map<String, String> value = uri.queryParameters;
-          if (value['id'] != null) {}
+        if (path.startsWith('/video/')) {
+          Utils.launchWeb(uri: Uri.parse(StringConstants.googlePlayLink));
+        } else if (path.startsWith('/mob/Post/')) {
+          Utils.launchWeb(uri: Uri.parse(StringConstants.googlePlayLink));
+        } else if (path.startsWith('/mob/refer/')) {
+          Map<String, dynamic> value = uri.queryParameters;
+          if (value['code'] != null) {
+            await checkReferalCodeValid(code: value['code']);
+          }
+        } else if (path.startsWith('/mob/Product/')) {
+          Utils.launchWeb(uri: Uri.parse(StringConstants.googlePlayLink));
         } else if (path.startsWith('/mob/QRImageAd/')) {
           Map<String, dynamic> value = uri.queryParameters;
           if (value['url'] != null &&
               value['companyId'] != null &&
               value['adId'] != null) {
+            await getQRAdDetails(adId: int.tryParse(value['adId'])!);
             if (kDebugMode) {
-              print('company  id ${value['companyId']}');
-              print(' ad id ${value['adId']}');
+              print('ad data ${qrAdDetailsData.first.adUrl}');
             }
-
-            await fetchCompanyData(value['companyId'], context);
             if (kDebugMode) {
               print('company data ${getCompanyModel?.data}');
             }
-            Get.to(
-              QrCodeImageVideoView(
-                adId: int.parse(value['adId']),
-                qrCodeValue: value['url'],
-                getCompanyModel: getCompanyModel!,
-              ),
-            );
+            if (qrAdDetailsData.isNotEmpty) {
+              Get.to(
+                QrCodeImageVideoView(
+                  qrAdDetailsModel: qrAdDetailsData[0],
+                ),
+              );
+            }
           }
         }
       }
     } else {
       Utils.showErrorMessage('Invalid QR Code');
+    }
+  }
+
+  Future<void> getQRAdDetails({required int adId}) async {
+    try {
+      var response =
+          await _apiServices.getApi('${UrlConstants.getAdDetailsForQr}/$adId');
+      QrAdDetails qrAdDetails = QrAdDetails.fromJson(response);
+      qrAdDetailsData.addAll(qrAdDetails.list);
+    } catch (e) {
+      if (kDebugMode) {
+        print('error $e');
+      }
     }
   }
 
@@ -180,6 +204,11 @@ class QrCodeAdDisplayController extends GetxController {
     } catch (e) {
       submittingData.value = false;
       Utils.showErrorMessage('Error $e');
+      Future.delayed(const Duration(seconds: 1), () {
+        Utils.launchWeb(
+            uri: Uri.parse(
+                'https://play.google.com/store/apps/details?id=com.adtip.app.adtip_app&hl=en_IN&gl=US'));
+      });
     }
   }
 
@@ -196,6 +225,40 @@ class QrCodeAdDisplayController extends GetxController {
     } catch (e) {
       loadingQrAdWebData.value = false;
       Utils.showErrorMessage('Something went wrong. $e');
+    }
+  }
+
+  Future<void> checkReferalCodeValid({required String code}) async {
+    try {
+      int userId =
+          LocalPrefs().getIntegerPref(key: SharedPreferenceKey.UserId)!;
+      var body = {"userId": userId, "referalCode": code};
+      var response =
+          await _apiServices.postApi(body, UrlConstants.checkReferalCodeValid);
+      int? isValid = response['data'][0]['isValid'];
+      int? referralCreatorId = response['data'][0]['referalCreator'];
+
+      String? referralCode = response['data'][0]['referalCode'];
+      if (isValid != null &&
+          isValid == 1 &&
+          referralCreatorId != null &&
+          referralCode != null &&
+          referralCode.isNotEmpty) {
+        await LocalPrefs().setIntegerPref(
+            key: SharedPreferenceKey.referralCreator, value: referralCreatorId);
+        await LocalPrefs().setStringPref(
+            key: SharedPreferenceKey.referralCode, value: referralCode);
+
+        if (kDebugMode) {
+          String? couponCode =
+              LocalPrefs().getStringPref(key: SharedPreferenceKey.referralCode);
+          int? couponCreatorId = LocalPrefs()
+              .getIntegerPref(key: SharedPreferenceKey.referralCreator);
+          print('coupon valid and saved $couponCode $couponCreatorId');
+        }
+      }
+    } catch (e) {
+      print('error saving referal data $e');
     }
   }
 }

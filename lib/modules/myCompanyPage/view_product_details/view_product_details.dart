@@ -327,7 +327,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             showImage: false,
                             onTap: () {
                               adModelsController.promoteLink.value =
-                                  'https://adtip.in/mob/Product/?productId=${productDetailsController.selectedProductId.value}&companyId=${controller.selectedCompanyId.value}';
+                                  'https://adtip.in/mob/Product?productId=${productDetailsController.selectedProductId.value}&companyId=${controller.selectedCompanyId.value}';
                               dashBoardController.changeWidget(value: 11);
                             }),
                       ),

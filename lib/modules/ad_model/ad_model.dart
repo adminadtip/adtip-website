@@ -8,8 +8,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../helpers/constants/Loader.dart';
 import '../../helpers/constants/asset_files.dart';
 import '../../helpers/constants/colors.dart';
+import '../../helpers/constants/string_constants.dart';
 import '../../helpers/local_database/local_prefs.dart';
 import '../../helpers/local_database/sharedpref_key.dart';
+import '../../helpers/utils/utils.dart';
 import '../createCompany/controller/imageItem.dart';
 import 'controllers/ad_models_controller.dart';
 import 'skip_video/widget/custom_video_player.dart';
@@ -141,38 +143,9 @@ class _AdModelScreenState extends State<AdModelScreen> {
                         )),
                     TextButton.icon(
                       onPressed: () {
-                        showDialog(
+                        Utils.showDialogDemoVideo(
                             context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                contentPadding: EdgeInsets.zero,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(0)),
-                                insetPadding:
-                                    const EdgeInsets.only(left: 10, right: 10),
-                                content: SingleChildScrollView(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      InkWell(
-                                          onTap: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Padding(
-                                            padding: EdgeInsets.all(8.0),
-                                            child: Icon(Icons.cancel),
-                                          )),
-                                      const SizedBox(height: 10),
-                                      const CustomVideoPlayer(
-                                          height: 210,
-                                          videoUrl:
-                                              'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4')
-                                    ],
-                                  ),
-                                ),
-                              );
-                            });
+                            videoLink: StringConstants.bookAdDemo);
                       },
                       label: Text(
                         "Watch Video",

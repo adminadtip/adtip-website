@@ -59,253 +59,249 @@ class _AdTrackingPageState extends State<AdTrackingPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: 'Total ad value - ₹ ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${adTrackingOrder.trackingOrderData.first.adOrderValue}/-',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'Total ad value - ₹ ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text.rich(
                           TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: 'Per ad Lead Cost - ₹ ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              TextSpan(
-                                text: adTrackingOrder
-                                    .trackingOrderData.first.perLeadCost
-                                    .toString(),
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
+                            text:
+                                '${adTrackingOrder.trackingOrderData.first.adOrderValue}/-',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text.rich(
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'Per ad Lead Cost - ₹ ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                           TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: 'Per day reach views -  ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${adTrackingOrder.trackingOrderData.first.adCustomerTargetPerDay}',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
+                            text: adTrackingOrder
+                                .trackingOrderData.first.perLeadCost
+                                .toString(),
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text.rich(
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'Per day reach views -  ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                           TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: 'Ad per view cost  - ₹ ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${adTrackingOrder.trackingOrderData.first.adPerViewCost ?? ""}',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
+                            text:
+                                '${adTrackingOrder.trackingOrderData.first.adCustomerTargetPerDay}',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text.rich(
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'Ad per view cost  - ₹ ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                           TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: 'Ad per Like cost - ₹ ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${adTrackingOrder.trackingOrderData.first.adPerLikeCost}/-',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
+                            text:
+                                '${adTrackingOrder.trackingOrderData.first.adPerViewCost ?? ""}',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text.rich(
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'Ad per Like cost - ₹ ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                           TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: 'no of days ad campaign - ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${adTrackingOrder.trackingOrderData.first.totalDays} days',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
+                            text:
+                                '${adTrackingOrder.trackingOrderData.first.adPerLikeCost}/-',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text.rich(
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'no of days ad campaign - ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                           TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: 'No of days completed - ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${adTrackingOrder.trackingOrderData.first.noOfDaysCompleted} days',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
+                            text:
+                                '${adTrackingOrder.trackingOrderData.first.totalDays} days',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text.rich(
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'No of days completed - ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                           TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: 'Total view till now - ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${adTrackingOrder.trackingOrderData.first.totalViews}',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
+                            text:
+                                '${adTrackingOrder.trackingOrderData.first.noOfDaysCompleted} days',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text.rich(
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'Total view till now - ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                           TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: 'Total Like till now - ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${adTrackingOrder.trackingOrderData.first.totalLikes}',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
+                            text:
+                                '${adTrackingOrder.trackingOrderData.first.totalViews}',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text.rich(
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'Total Like till now - ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                           TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: 'Total Available Balance - ₹ ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${adTrackingOrder.trackingOrderData.first.totalAvailableBalance}/-',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
+                            text:
+                                '${adTrackingOrder.trackingOrderData.first.totalLikes}',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'Total Available Balance - ₹ ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          TextSpan(
+                            text:
+                                '${adTrackingOrder.trackingOrderData.first.totalAvailableBalance}/-',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),

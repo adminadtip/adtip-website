@@ -35,43 +35,6 @@ class _CreateCompanyPageState extends State<CreateCompanyPage> {
   RegExp regExp = RegExp(
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
   final _formKey = GlobalKey<FormState>();
-  bool isUsernameAlreadyUsed = false;
-  String? errorMessage;
-  final BehaviorSubject<String> _debounce = BehaviorSubject<String>();
-  List<CompanyDetail>? companyList;
-
-  @override
-  void initState() {
-    super.initState();
-    _debounce
-        .debounceTime(const Duration(
-            milliseconds: 1000)) // Adjust the debounce time as needed
-        .listen((String value) {
-      // Make your API call here using the value from the text field
-      fetchCompaniesList(value);
-
-      setState(() {});
-    });
-  }
-
-  void fetchCompaniesList(String value) async {
-    companyList = await controller.fetchCompanyList();
-    if (companyList != null) {
-      var result = companyList!.firstWhere(
-          (element) =>
-              element.name!.toLowerCase().removeAllWhitespace ==
-              value.toLowerCase().removeAllWhitespace,
-          orElse: () => CompanyDetail());
-      if (result.name != null) {
-        isUsernameAlreadyUsed = true;
-        errorMessage = 'Company name Already Taken!';
-      } else {
-        isUsernameAlreadyUsed = false;
-        errorMessage = null;
-      }
-    }
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -134,29 +97,30 @@ class _CreateCompanyPageState extends State<CreateCompanyPage> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  CTextFormField(
-                                    labelText: 'Company Name',
-                                    errorMessage: controller.isLoading.value
-                                        ? null
-                                        : errorMessage,
-                                    suffixWidget: controller.isLoading.value
-                                        ? const CircularProgressIndicator()
-                                        : null,
-                                    hintText: "Company name",
-                                    keyboardType: TextInputType.multiline,
-                                    callBack: (p0) {
-                                      setState(() {
-                                        companyName = p0;
-                                        _debounce.add(p0);
-                                      });
-                                    },
-                                    validatorForm: (p0) {
-                                      if (p0!.isEmpty) {
-                                        return "Invalid Company Name";
-                                      }
-                                      return null;
-                                    },
-                                  ),
+                                  Obx(() => CTextFormField(
+                                        labelText: 'Company Name',
+                                        errorMessage: controller
+                                                .isCheckingCompanyName.value
+                                            ? null
+                                            : controller
+                                                .errorMessageForCompanyExist
+                                                .value,
+                                        suffixWidget: controller
+                                                .isCheckingCompanyName.value
+                                            ? const CircularProgressIndicator()
+                                            : null,
+                                        hintText: "Company name",
+                                        keyboardType: TextInputType.multiline,
+                                        callBack: (p0) {
+                                          companyName = p0;
+                                        },
+                                        validatorForm: (p0) {
+                                          if (p0!.isEmpty) {
+                                            return "Invalid Company Name";
+                                          }
+                                          return null;
+                                        },
+                                      )),
                                   const SizedBox(
                                     height: 10,
                                   ),
@@ -232,8 +196,9 @@ class _CreateCompanyPageState extends State<CreateCompanyPage> {
                                 textColor: AdtipColors.white,
                                 showImage: false,
                                 onTap: () {
-                                  if (_formKey.currentState!.validate() &&
-                                      !isUsernameAlreadyUsed) {
+                                  print(
+                                      'company name exist ${controller.isCompanyNameAlreadyUsed.value}');
+                                  if (_formKey.currentState!.validate()) {
                                     controller.userCompanyProfile.companyEmail =
                                         companyEmail;
                                     controller.userCompanyProfile.companyName =
@@ -242,6 +207,7 @@ class _CreateCompanyPageState extends State<CreateCompanyPage> {
                                         phoneNumber;
                                     controller.userCompanyProfile.location =
                                         locationDetails;
+                                    print('company name $companyName');
                                     Get.to(() => const CompanyPage());
                                   }
                                 }),

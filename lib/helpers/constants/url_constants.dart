@@ -135,4 +135,11 @@ class UrlConstants {
   static String checkadpendingbalance = '${BASE_URL}checkadpendingbalance/';
   static String insertQRScanWebData = '${BASE_URL}insertQRScanWebData';
   static String getQrWebData = '${BASE_URL}getQrAdWebByAdIdForAdvertiser';
+
+  ///ad model
+  static String getAdDetailsForQr = '${BASE_URL}getAdDetailsForQr';
+
+  ///referal
+  static String generateReferal = '${BASE_URL}generateReferalId';
+  static String checkReferalCodeValid = '${BASE_URL}checkReferalCodeValid';
 }

@@ -251,7 +251,7 @@ class SkipVideoController extends GetxController {
     String? adCompanyLocation,
     String? adTaxNumber,
     String? adPlaceApp,
-    String? adRefferal,
+    int? adRefferal,
     String? adPaymendMode,
     String? adOrderValue,
     String? adChargesValue,
@@ -274,11 +274,12 @@ class SkipVideoController extends GetxController {
       'adChargesValue': adChargesValue,
       'adTax': adTax,
       'adTotal': adTotal,
-      'adCoupan': adCoupan
+      'adCoupan': adCoupan,
+      'userId': LocalPrefs().getIntegerPref(key: SharedPreferenceKey.UserId),
     };
 
     try {
-      print(data);
+      print('ad id ${id.value}');
       loadingThird.value = true;
       await _apiServices.postApi(data, UrlConstants.saveThirdpageadmodelURL);
       await onSuccess();

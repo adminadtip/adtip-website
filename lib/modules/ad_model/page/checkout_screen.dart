@@ -21,23 +21,8 @@ import '../skip_video/widget/custom_video_player.dart';
 import 'package:flutter_razorpay_web/flutter_razorpay_web.dart';
 
 class CheckOutScreen extends StatefulWidget {
-  // final String tax;
-  // final String loc;
-  // final String website;
-  // final String des;
-  // final int orderValue;
-  // final String campaign;
-  // final String name;
-
   const CheckOutScreen({
     super.key,
-    // required this.des,
-    // required this.loc,
-    // required this.tax,
-    // required this.website,
-    // required this.orderValue,
-    // required this.campaign,
-    // required this.name,
   });
 
   @override
@@ -80,29 +65,6 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
               children: [
                 if (skipVideoController.videoUrl.value != null ||
                     skipVideoController.videoUrl.value != "")
-                  //   FutureBuilder(
-                  //       future: skipVideoController
-                  //           .genThumbnailFile(skipVideoController.videoUrl.value),
-                  //       builder: (context, snapshot) {
-                  //         if (snapshot.hasData) {
-                  //           return Image.file(
-                  //             snapshot.data!,
-                  //             width: 90,
-                  //             height: 120,
-                  //             fit: BoxFit.fill,
-                  //           );
-                  //         }
-                  //         return const SizedBox(
-                  //             width: 90,
-                  //             height: 120,
-                  //             child: Column(
-                  //               mainAxisAlignment: MainAxisAlignment.center,
-                  //               children: [
-                  //                 CircularProgressIndicator(),
-                  //               ],
-                  //             ));
-                  //       })
-                  // else
                   CachedNetworkImage(
                     imageUrl: skipVideoController.imageUrl.value,
                     width: 90,
@@ -117,12 +79,6 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                       fit: BoxFit.fill,
                     ),
                   ),
-                // Image.asset(
-                //   'assets/extra/Thumbnail_(2).png',
-                //   width: 70.w,
-                //   height: 110.h,
-                //   fit: BoxFit.cover,
-                // ),
                 const SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,14 +96,6 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                             )),
-                        const SizedBox(width: 5),
-                        const Text(
-                          "Celebration Status",
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        )
                       ],
                     ),
                     Container(
@@ -230,98 +178,104 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
               ],
             )),
             const SizedBox(height: 20),
-            const Text("Payment Information",
+            // const Text("Payment Information",
+            //     style: TextStyle(
+            //       fontSize: 20,
+            //       fontWeight: FontWeight.w600,
+            //     )),
+            // const SizedBox(height: 5),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     const Column(
+            //       crossAxisAlignment: CrossAxisAlignment.start,
+            //       children: [
+            //         Row(
+            //           children: [
+            //             Text('Selected: ',
+            //                 style: TextStyle(
+            //                     fontWeight: FontWeight.bold, fontSize: 13)),
+            //             Text('UPI', style: TextStyle(fontSize: 11))
+            //           ],
+            //         ),
+            //         Row(
+            //           children: [
+            //             Text('Other: ',
+            //                 style: TextStyle(
+            //                     fontWeight: FontWeight.bold, fontSize: 13)),
+            //             Text('Razorpay, paypal, Visa',
+            //                 style: TextStyle(fontSize: 11))
+            //           ],
+            //         )
+            //       ],
+            //     ),
+            //     Icon(Icons.arrow_forward_ios_outlined,
+            //         color: Colors.grey.shade500)
+            //   ],
+            // ),
+            const Text("Referral Code",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                 )),
-            const SizedBox(height: 5),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text('Selected: ',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 13)),
-                        Text('UPI', style: TextStyle(fontSize: 11))
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text('Other: ',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 13)),
-                        Text('Razorpay, paypal, Visa',
-                            style: TextStyle(fontSize: 11))
-                      ],
-                    )
-                  ],
-                ),
-                Icon(Icons.arrow_forward_ios_outlined,
-                    color: Colors.grey.shade500)
-              ],
-            ),
-            const SizedBox(height: 20),
-            InkWell(
-              onTap: () {
-                // Get.to(CouponScreen())?.then((value) {
-                //   setState(() {
-                //     couponCode = value.couponCode;
-                //     coupon = value.couponDiscount;
-                //   });
-                //   print(value.couponCode);
-                // });
-              },
+            const SizedBox(height: 10),
+            Container(
+              height: 50,
+              padding: const EdgeInsets.only(left: 5),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+              ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Apply coupon",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      )),
-                  Icon(
-                    Icons.arrow_forward_ios_outlined,
-                    color: Colors.grey.shade500,
-                    size: 20,
-                  )
+                  Expanded(
+                    child: TextFormField(
+                      controller:
+                          adModelController.referralTextEditingController,
+                      onChanged: (value) {
+                        adModelController.referralValid.value = false;
+                      },
+                      decoration: const InputDecoration(
+                          hintText: 'Enter Referral Code'),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 100,
+                    child: Obx(() {
+                      if (adModelController.checkingReferral.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      return CLoginButton(
+                        title: 'Apply',
+                        buttonColor: Colors.black,
+                        textColor: Colors.white,
+                        showImage: false,
+                        onTap: () async {
+                          if (adModelController
+                              .referralTextEditingController.text.isNotEmpty) {
+                            await adModelController.checkReferralCodeValid(
+                                code: adModelController
+                                    .referralTextEditingController.text
+                                    .trim());
+                          }
+                        },
+                      );
+                    }),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 5),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (couponCode != null)
-                      Row(
-                        children: [
-                          const Text('Added: ',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 13)),
-                          Text(couponCode ?? "",
-                              style: const TextStyle(fontSize: 11))
-                        ],
-                      ),
-                    // Row(
-                    //   children: [
-                    //     Text('More: ',
-                    //         style: TextStyle(
-                    //             fontWeight: FontWeight.bold,
-                    //             fontSize: 13.sp)),
-                    //     Text('HDFC30, NEW50, FIRST70',
-                    //         style: TextStyle(fontSize: 11.sp))
-                    //   ],
-                    // )
-                  ],
+            Obx(
+              () => Text(
+                adModelController.referralValid.value
+                    ? 'Referral code is applied!'
+                    : 'Referral code is invalid!',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: adModelController.referralValid.value
+                      ? Colors.green
+                      : Colors.red,
                 ),
-              ],
+              ),
             ),
             const SizedBox(height: 20),
             Row(
@@ -371,13 +325,28 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                    'Delivery charge ${coupon != 0 ? ((coupon * 30) / 100) : 15}%',
-                    style: const TextStyle(fontSize: 13)),
+                const Text('Delivery charge 20%',
+                    style: TextStyle(fontSize: 13)),
                 Text('₹ ${finalDelCharge.toStringAsFixed(2)}',
                     style: const TextStyle(
                         fontSize: 11, fontWeight: FontWeight.bold))
               ],
+            ),
+            const SizedBox(height: 5),
+            Obx(
+              () => adModelController.referralValid.value
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Coupon Applied -5%',
+                            style: TextStyle(fontSize: 13)),
+                        Text(
+                            '- ₹ ${(adModelController.adValue.value * 5 / 100).toStringAsFixed(2)}',
+                            style: const TextStyle(
+                                fontSize: 11, fontWeight: FontWeight.bold))
+                      ],
+                    )
+                  : const SizedBox.shrink(),
             ),
             const SizedBox(height: 5),
             _switchValue
@@ -393,16 +362,16 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                 : const SizedBox.shrink(),
             const Divider(),
             const SizedBox(height: 15),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Total', style: TextStyle(fontSize: 13)),
-                Text(
-                    '₹ ${(adModelController.adValue.value + gst + finalDelCharge).toStringAsFixed(2)}',
-                    style: const TextStyle(
-                        fontSize: 11, fontWeight: FontWeight.bold))
-              ],
-            ),
+            Obx(() => Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Total', style: TextStyle(fontSize: 13)),
+                    Text(
+                        '₹ ${(adModelController.adValue.value - (adModelController.referralValid.value ? adModelController.adValue.value * 5 / 100 : 0) + gst + finalDelCharge).toStringAsFixed(2)}',
+                        style: const TextStyle(
+                            fontSize: 11, fontWeight: FontWeight.bold))
+                  ],
+                )),
             const SizedBox(height: 20),
             Obx(
               () => skipVideoController.loadingThird.value
@@ -412,7 +381,10 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                       onTap: () {
                         double totalAmount = adModelController.adValue.value +
                             gst +
-                            finalDelCharge;
+                            finalDelCharge -
+                            (adModelController.referralValid.value
+                                ? adModelController.adValue * 5 / 100
+                                : 0);
                         int totalMainAmount = (totalAmount * 100).toInt();
                         log(
                           totalMainAmount.toString(),
@@ -428,24 +400,6 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                           paymentData: paymentData,
                           name: adModelController.compaignName.value,
                         );
-                        // skipVideoController.saveThirdPageAdModel(
-                        //     adDescription: widget.des,
-                        //     adOrderValue: widget.orderValue.toStringAsFixed(2),
-                        //     adChargesValue: finalDelCharge.toStringAsFixed(2),
-                        //     adCompanyLocation: widget.loc,
-                        //     adCoupan: "Test",
-                        //     adPaymendMode: "UPI",
-                        //     adPlaceApp: "Delhi",
-                        //     adRefferal: "TEST",
-                        //     adTax: gst.toStringAsFixed(2),
-                        //     adTaxNumber: widget.tax,
-                        //     adWebsite: widget.website,
-                        //     adWebsiteLink: widget.website,
-                        //     adTotal: (widget.orderValue + gst + finalDelCharge)
-                        //         .toString(),
-                        //     onSuccess: () {
-                        //       Get.to(SuccessScreen());
-                        //     });
                       },
                       buttonColor: AdtipColors.black,
                       textColor: AdtipColors.white,
@@ -485,19 +439,14 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   @override
   void initState() {
     _razorpay = Razorpay();
-    // _razorpay = RazorpayWeb(
-    //   onSuccess: _onSuccess,
-    //   onCancel: _onCancel,
-    //   onFailed: _onFailed,
-    // );
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _onSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _onCancel);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _onFailed);
-    delCharge = ((.15) * adModelController.adValue.value);
-    couponDiscount = delCharge * (coupon / 100);
-    finalDelCharge = delCharge - couponDiscount;
+    delCharge = ((.2) * adModelController.adValue.value);
+    finalDelCharge = delCharge;
     gst = _switchValue ? (.18 * (adModelController.adValue.value)) : 0;
     super.initState();
+    adModelController.getReferralCode();
   }
 
   @override
@@ -524,16 +473,25 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         adOrderValue: adModelController.adValue.value.toStringAsFixed(2),
         adChargesValue: finalDelCharge.toStringAsFixed(2),
         adCompanyLocation: adModelController.location.value,
-        adCoupan: "Test",
+        adCoupan: adModelController.referralValid.value
+            ? adModelController.referralCodeToUse.value
+            : null,
         adPaymendMode: "UPI",
         adPlaceApp: "Delhi",
-        adRefferal: "TEST",
+        adRefferal: adModelController.referralValid.value
+            ? adModelController.referralCreator.value
+            : null,
         adTax: gst.toStringAsFixed(2),
         adTaxNumber: adModelController.tax.value,
         adWebsite: adModelController.website.value,
         adWebsiteLink: adModelController.website.value,
-        adTotal:
-            (adModelController.adValue.value + gst + finalDelCharge).toString(),
+        adTotal: (adModelController.adValue.value -
+                (adModelController.referralValid.value
+                    ? adModelController.adValue.value * 5 / 100
+                    : 0) +
+                gst +
+                finalDelCharge)
+            .toString(),
         onSuccess: () {
           dashboardController.changeWidget(value: 16);
 
@@ -543,131 +501,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     // Here we get razorpay_payment_id razorpay_order_id razorpay_signature
   }
 
-  void _handlePaymentError(PaymentFailureResponse response) {
-    print('error payment ${response.message}');
-  }
-
-  void _handleExternalWallet(ExternalWalletResponse response) {
-    // Do something when an external wallet is selected
-  }
-  // void initiatePayment(
-  //     {required Map<String, dynamic> paymentData, required String name}) {
-  //   var uuid = const Uuid();
-  //   _makePayment(
-  //     amount: paymentData['amount'].toString(),
-  //     orderId: uuid.v4(),
-  //     keyId: AppConstent.apiSecretRozer,
-  //   );
-  // }
-  //
-  // void _makePayment({
-  //   required String amount,
-  //   required String orderId,
-  //   required String keyId,
-  // }) {
-  //   /// create payment options
-  //   /// you can modify as per your requirements.
-  //   /// Ref: https://razorpay.com/docs/payments/server-integration/nodejs/payment-gateway/build-integration/#code-to-add-pay-button
-  //   final Map<String, dynamic> options = {
-  //     "key": keyId,
-  //     "amount": amount,
-  //     "currency": "INR",
-  //     "order_id": orderId,
-  //     "timeout": "240",
-  //     "name": "Adtip",
-  //     "description": "Watch to Earn",
-  //     'prefill': {'contact': '1234567890', 'email': 'test@example.com'},
-  //     "readonly": {"contact": true, "email": true},
-  //     "send_sms_hash": true,
-  //     "remember_customer": false,
-  //     "retry": {"enabled": false},
-  //     "hidden": {"contact": false, "email": false}
-  //   };
-  //
-  //   /// config razorpay payment methods.
-  //   /// This is a "optional" step if you want
-  //   /// to customize your payment methods then use this step "options["config"]",
-  //   /// otherwise you can skip this step .
-  //   /// You can also modify as per your requirements.
-  //   /// Ref: https://razorpay.com/docs/api/payments/payment-links/customise-payment-methods/
-  //   options["config"] = {
-  //     "display": {
-  //       "blocks": {
-  //         "utib": {
-  //           "name": "Pay using Axis Bank",
-  //           "instruments": [
-  //             {
-  //               "method": "card",
-  //               "issuers": ["UTIB"]
-  //             },
-  //             {
-  //               "method": "netbanking",
-  //               "banks": ["UTIB"]
-  //             }
-  //           ]
-  //         },
-  //         "other": {
-  //           "name": "Other Payment modes",
-  //           "instruments": [
-  //             {"method": "card"},
-  //             {"method": "netbanking"},
-  //             {"method": "wallet"}
-  //           ]
-  //         }
-  //       },
-  //       "hide": [
-  //         {
-  //           "method": "upi",
-  //         },
-  //         {"method": "emi"}
-  //       ],
-  //       "sequence": ["block.utib", "block.other"],
-  //       "preferences": {"show_default_blocks": false}
-  //     }
-  //   };
-  //   _razorpay.open(options);
-  // }
-
   Future<void> initiatePayment(
       {required Map<String, dynamic> paymentData, required String name}) async {
-    // String apiUrl = 'https://api.razorpay.com/v1/orders';
-    // // Make the API request to create an order
-    // http.Response response = await http.post(
-    //   Uri.parse(apiUrl),
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': 'Basic ${base64Encode(
-    //       utf8.encode(
-    //           '${AppConstent.apiKeyRozer}:${AppConstent.apiSecretRozer}'),
-    //     )}',
-    //   },
-    //   body: jsonEncode(paymentData),
-    // );
-    //
-    // if (response.statusCode == 200) {
-    //   // Parse the response to get the order ID
-    //   var responseData = jsonDecode(response.body);
-    //   String orderId = responseData['id'];
-    //
-    //   // Set up the payment options
-    //   var options = {
-    //     'key': AppConstent.apiKeyRozer,
-    //     'amount': paymentData['amount'],
-    //     'name': name,
-    //     'order_id': orderId,
-    //     'prefill': {'contact': '1234567890', 'email': 'test@example.com'},
-    //     'external': {
-    //       'wallets': ['paytm'] // optional, for adding support for wallets
-    //     }
-    //   };
-    //
-    //   // Open the Razorpay payment form
-    //   _razorpay.open(options);
-    // } else {
-    //   // Handle error response
-    //   debugPrint('Error creating order: ${response.body}');
-    // }
-
     var options = {
       'key': AppConstent.apiKeyRozer,
       'amount': paymentData['amount'],

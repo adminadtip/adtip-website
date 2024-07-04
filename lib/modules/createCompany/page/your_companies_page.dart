@@ -37,9 +37,6 @@ class _YourCompaniesPageState extends State<YourCompaniesPage> {
   @override
   void initState() {
     super.initState();
-    if (controller.fetchedCompanyList.isNotEmpty) {
-      controller.fetchCompanyList();
-    }
   }
 
   DashboardController dashBoardController = Get.put(DashboardController());
@@ -50,7 +47,7 @@ class _YourCompaniesPageState extends State<YourCompaniesPage> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      return controller.isLoading.value
+      return controller.fetchingCompany.value
           ? const SizedBox(
               width: 50, height: 50, child: CircularProgressIndicator())
           : SizedBox(

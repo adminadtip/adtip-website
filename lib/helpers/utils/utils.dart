@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
+import '../../modules/ad_model/skip_video/widget/custom_video_player.dart';
 import '../../netwrok/exceptions.dart';
 import '../../netwrok/network_api_services.dart';
 import 'package:http/http.dart' as http;
@@ -157,6 +158,42 @@ class Utils {
     }
   }
 
+  static showDialogDemoVideo(
+      {required BuildContext context, required String videoLink}) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.zero,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+            insetPadding: const EdgeInsets.only(left: 10, right: 10),
+            content: SingleChildScrollView(
+              child: SizedBox(
+                height: 400,
+                width: 400,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(Icons.cancel),
+                        )),
+                    const SizedBox(height: 10),
+                    CustomVideoPlayer(height: 210, videoUrl: videoLink)
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   static Future<String> uploadVideoToAwsAmplify(
       {required String path, required String folderName}) async {
     try {
@@ -214,8 +251,14 @@ class Utils {
   }
 
   static Future<void> launchWeb({required Uri uri}) async {
-    if (!await launchUrl(uri)) {
-      throw Exception('Could not launch $uri');
+    try {
+      if (!await launchUrl(uri)) {
+        throw Exception('Could not launch $uri');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('error $e');
+      }
     }
   }
 

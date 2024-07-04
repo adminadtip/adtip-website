@@ -14,6 +14,7 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:intl/intl.dart';
 import '../../../helpers/constants/colors.dart';
+import '../../../helpers/constants/string_constants.dart';
 import '../../../helpers/local_database/local_prefs.dart';
 import '../../../helpers/local_database/sharedpref_key.dart';
 import '../../../widgets/button/c_login_button.dart';
@@ -190,9 +191,24 @@ class _SkipVideoScreenState extends State<SkipVideoScreen>
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    adModelController.title.value,
-                    style: const TextStyle(fontSize: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        adModelController.title.value,
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      InkWell(
+                          onTap: () {
+                            Utils.showDialogDemoVideo(
+                                context: context,
+                                videoLink: StringConstants.bookAdDemo);
+                          },
+                          child: const Text(
+                            'Learn How to Book Ad',
+                            style: TextStyle(color: Colors.blue),
+                          )),
+                    ],
                   ),
                   const SizedBox(
                     height: 20,

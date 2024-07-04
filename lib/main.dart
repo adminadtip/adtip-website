@@ -61,23 +61,6 @@ class _MyAppState extends State<MyApp> {
     boardingShow();
   }
 
-  void openAppUrl() {
-    // Attempt to open the custom URL scheme
-    window.location.assign('myapp://');
-  }
-
-  void redirectToPlayStore() {
-    // Replace <your_app_package_name> with your app's package name in the Play Store
-    const playStoreUrl =
-        'https://play.google.com/store/apps/details?id=com.adtip.app.adtip_app';
-    window.location.assign(playStoreUrl);
-  }
-
-  void redirectToDifferentPage() {
-    // Redirect to a different page
-    window.location.assign('https://adtip.in');
-  }
-
   void boardingShow() async {
     final uri = Uri.parse(window.location.href);
     final pathSegments = uri.pathSegments;

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -26,6 +27,13 @@ class AdModelsController extends GetxController {
   Rx<String> website = ''.obs;
   Rx<String> tax = ''.obs;
   Rx<String> promoteLink = ''.obs;
+
+  ///for referral
+  RxInt referralCreator = 0.obs;
+  RxString referralCodeToUse = ''.obs;
+  RxBool referralValid = false.obs;
+  final referralTextEditingController = TextEditingController();
+  RxBool checkingReferral = false.obs;
 
   final _apiServices = NetworkApiServices();
   Future getAdModelsList() async {
@@ -98,5 +106,58 @@ class AdModelsController extends GetxController {
     modelId.value = modelId1;
     mediaType.value = mediaType1;
     link.value = link1;
+  }
+
+  Future<void> getReferralCode() async {
+    try {
+      String? couponCode =
+          LocalPrefs().getStringPref(key: SharedPreferenceKey.referralCode);
+      int? couponCreatorId =
+          LocalPrefs().getIntegerPref(key: SharedPreferenceKey.referralCreator);
+      if (kDebugMode) {
+        print('coupon $couponCode $couponCreatorId}');
+      }
+      if (couponCode != null && couponCreatorId != null) {
+        referralTextEditingController.text = couponCode;
+        await checkReferralCodeValid(code: couponCode);
+      }
+    } catch (e) {
+      print('error runnug code $e');
+      referralValid.value = false;
+    }
+  }
+
+  Future<void> checkReferralCodeValid({required String code}) async {
+    try {
+      checkingReferral.value = true;
+      int? userId =
+          LocalPrefs().getIntegerPref(key: SharedPreferenceKey.UserId);
+
+      var body = {"userId": userId, "referalCode": code};
+      var response =
+          await _apiServices.postApi(body, UrlConstants.checkReferalCodeValid);
+      int? isValid = response['data'][0]['isValid'];
+      int? referralCreatorId = response['data'][0]['referalCreator'];
+      String? referralCode = response['data'][0]['referalCode'];
+      checkingReferral.value = false;
+      if (isValid != null &&
+          isValid == 1 &&
+          referralCreatorId != null &&
+          referralCode != null &&
+          referralCode.isNotEmpty) {
+        referralCreator.value = referralCreatorId;
+        referralValid.value = true;
+        referralCodeToUse.value = referralCode;
+
+        if (kDebugMode) {
+          print('coupon valid and can be used $isValid');
+        }
+      } else {
+        referralValid.value = false;
+      }
+    } catch (e) {
+      checkingReferral.value = false;
+      referralValid.value = false;
+    }
   }
 }

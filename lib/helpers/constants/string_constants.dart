@@ -88,4 +88,12 @@ class StringConstants {
     'Historian',
     'Hotel manager',
   ];
+  static const String bookAdDemo =
+      'https://d3v9wkwq2gjvjn.cloudfront.net/assets/demo_adtip_website/MP4/demo_adtip_website.mp4';
+  static const String fbLink = 'https://www.facebook.com/adtipindia';
+  static const String instLink = 'https://www.instagram.com/adtipindia/';
+  static const String linkedinLink =
+      'https://in.linkedin.com/company/adtipindia';
+  static const String whatsapp =
+      "https://wa.me/918148147172?text=Hi%2C%20I%20need%20help%20in%20Adtip";
 }
